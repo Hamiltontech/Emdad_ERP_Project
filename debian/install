@@ -1,0 +1,2 @@
+debian/emdad.conf /etc/emdad
+README.md /usr/share/doc/emdad

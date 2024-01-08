@@ -1,0 +1,28 @@
+#!/bin/sh
+
+set -e
+
+emdad_LIB_DIR=/var/lib/emdad
+emdad_USER="emdad"
+emdad_GROUP="emdad"
+
+case "${1}" in
+    remove)
+        deluser --quiet --system $emdad_USER || true
+        delgroup --quiet --system --only-if-empty $emdad_GROUP || true
+        ;;
+
+    purge)
+        if [ -d "$emdad_LIB_DIR" ]; then
+            rm -rf $emdad_LIB_DIR
+        fi
+        ;;
+
+    upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+        ;;
+
+esac
+
+#DEBHELPER#
+
+exit 0

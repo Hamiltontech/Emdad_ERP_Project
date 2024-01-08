@@ -1,0 +1,34 @@
+#!/bin/sh
+
+set -e
+
+emdad_CONFIGURATION_FILE=/etc/emdad/emdad.conf
+emdad_GROUP="emdad"
+emdad_DATA_DIR=/var/lib/emdad
+emdad_LOG_DIR=/var/log/emdad
+emdad_USER="emdad"
+
+case "${1}" in
+    configure)
+        if ! getent passwd | grep -q "^emdad:"; then
+            adduser --system --home $emdad_DATA_DIR --quiet --group $emdad_USER
+            # Data dir
+            chown $emdad_USER:$emdad_GROUP $emdad_DATA_DIR
+        fi
+        # Register "$emdad_USER" as a postgres user with "Create DB" role attribute
+        su - postgres -c "createuser -d -R -S $emdad_USER" 2> /dev/null || true
+        # Configuration file
+        chown $emdad_USER:$emdad_GROUP $emdad_CONFIGURATION_FILE
+        chmod 0640 $emdad_CONFIGURATION_FILE
+        # Log
+        mkdir -p $emdad_LOG_DIR
+        chown $emdad_USER:$emdad_GROUP $emdad_LOG_DIR
+        chmod 0750 $emdad_LOG_DIR
+        ;;
+    *)
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0
