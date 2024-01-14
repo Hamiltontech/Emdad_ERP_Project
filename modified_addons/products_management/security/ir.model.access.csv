@@ -1,8 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-products_management,Access product.management model,model_product_management,base.group_user,1,1,1,1
-product_metrics,Access product.metrics model,model_product_metrics,base.group_user,1,1,1,1
-product_unit,Access product.units model,model_product_units,base.group_user,1,1,1,1
-emdad_products_pricing,Access emdad.products.pricing model,model_emdad_products_pricing,base.group_user,1,1,1,1
-product_emdad_category,Access product.emdad.category model,model_product_emdad_category,base.group_user,1,1,1,1
-
-
