@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<emdad>
+    <record id="emdad_fleet_view_form" model="ir.ui.view">
+        <field name="name">emdad_fleet.view.form</field>
+        <field name="model">emdad.fleet</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                                                <field name="container_status" widget="badge"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group name="Truck Information" string="Truck Information">
+                        <group>
+                            <field name="model"/>
+                            <field name="year"/>
+                            <field name="related_location"/>
+                            <filed name="container_quantity"/>
+                        </group>
+                        <group>
+                            <field name="engine_hp"/>
+                            <field name="insurance_plan" context="{'default_related_truck': id}"/>
+                            <field name="status" widget="badge"/>
+                        </group>                      
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="emdad_fleet_insurance_view_form" model="ir.ui.view">
+        <field name="name">emdad_fleet_insurance.view.form</field>
+        <field name="model">emdad.fleet.insurance</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="insurance_company"/>
+                        <field name="contract_start_date"/>
+                        <field name="contract_next_renewal"/>
+                    </group>
+                    <group>
+                        <field name="status" widget="badge"/>
+                        <field name="contract_value"/>
+                        <field name="related_truck"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="emdad_fleet_action" model="ir.actions.act_window">
+        <field name="name">Fleet Management</field>
+        <field name="res_model">emdad.fleet</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+        
+    </record>
+    <menuitem
+        id="emdad_fleet_menu"
+        name="Fleet Management"
+        sequence="10"/>
+    <menuitem
+        id="emdad_fleet_management_menu"
+        name="Fleet Management"
+        action="emdad_fleet_action"
+        parent="emdad_fleet_menu"
+        sequence="10"/>
+
+</emdad>

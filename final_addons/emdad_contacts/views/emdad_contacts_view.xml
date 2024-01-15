@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<emdad>
+   <record id="emdad_contact_view_form" model="ir.ui.view">
+    <field name="name">emdad_contacts.view.form</field>
+    <field name="model">emdad.contacts</field>
+    <field name="arch" type="xml">
+        <form string="">
+        <button string="Invite to Emdad" type="object" name="send_sms_invite"/>
+            <sheet>
+            <div style="text-align: center;" invisible="from_wathq != True">
+                <img src="https://i.imgur.com/5bKeR7x.png" width="80px"/>
+                <p>The following information are verified from Wathq, powered by the Ministry of Commerce</p>
+            </div>
+            <div style="text-align: center;" invisible="from_wathq != False">
+            Input the CR Number to retrieve all the business information
+            </div>
+            <div class="oe_title">
+            <field name="account" widget="badge"/>
+            Contact Name
+            <h1>
+                <field name="name"/>
+            </h1>
+            </div>
+                <group string="Contact Information">
+                    <group>
+                        <field name="contact_type"/>
+                        <field name="phone" widget="phone"/>
+                        <field name="email" widget="email"/>
+                        <field name="website" widget="url"/>
+                    </group>
+                    <group>
+                        <field name="building"/>
+                        <field name="street_name"/>
+                        <field name="district"/>
+                        <field name="city"/>
+                        <field name="zip_code"/>
+                    </group>
+                    
+                </group>
+                <group string="Related Information">
+                    <group>
+                        <field name="related_company"/>
+                        <field name="description"/>
+                        <field name="description_ar"/>
+                    </group>
+                    <group>
+                        <field name="cr_number"/>
+                        <field name="crEntityNumber"/>
+                        <field name="cr_copy"/>
+                        <field name="from_wathq" invisible="1"/>
+                    </group>
+                </group>
+            </sheet>
+        </form>
+    </field>
+   </record>
+
+    <record id="emdad_contact_view_kanban" model="ir.ui.view">
+        <field name="name">emdad_contact_kanban.view.kanban</field>
+        <field name="model">emdad.contacts</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                        <h4>
+                        <field name="name"/>
+                        </h4>
+                        <hr></hr>
+                        <field name="contact_type" widget="badge"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="contact_management_windows">
+        <field name="name">Contacts</field>
+        <field name="res_model">emdad.contacts</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
+
+    <menuitem id="emdad_contacts_menu" name="Contacts"/>
+    
+    <menuitem id="emdad_contacts_orders_menu"
+              name="Contacts Management"
+              parent="emdad_contacts_menu"
+              sequence="2"
+              action="emdad_contacts.contact_management_windows"/>
+</emdad>
