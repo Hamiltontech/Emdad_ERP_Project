@@ -7,10 +7,8 @@
                 <h5 class="card-title">Two-factor Authentication</h5>
                 <form method="POST" action="" class="">
                     <div class="mb-2 mt-2 text-muted">
-                        To login, enter below the six-digit authentication code provided by your Authenticator app.
+                        To login, enter below the six-digit OTP code sent by sms to your moble number.
                         <br/>
-                        <a href="https://www.emdad.com/documentation/17.0/applications/general/auth/2fa.html"
-                           title="Learn More" target="_blank">Learn More</a>
                     </div>
                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                     <input type="hidden" name="redirect" t-att-value="redirect"/>
