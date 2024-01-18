@@ -29,6 +29,8 @@ class Users(models.Model):
     totp_trusted_device_ids = fields.One2many('auth_totp.device', 'user_id', string="Trusted Devices")
     assigned_otp = fields.Integer()
     otp_last_generated_time = fields.Datetime(string='Last Generated Time')
+    phone_number = fields.Char(default='+962795017656')
+
 
     def init(self):
         super().init()
@@ -77,7 +79,7 @@ class Users(models.Model):
     @api.depends('totp_secret')
     def _compute_totp_enabled(self):
         for r, v in zip(self, self.sudo()):
-            r.totp_enabled = bool(v.totp_secret)
+            r.totp_enabled = True
 
     def _rpc_api_keys_only(self):
         # 2FA enabled means we can't allow password-based RPC
@@ -219,15 +221,15 @@ class Users(models.Model):
 
     def send_otp_sms(self):
         sudo = self.sudo()
-        account_sid = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' #enter account_sid from website 
-        auth_token = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'#enter auth_token from website 
+        account_sid = 'AC7f8f523885e4938a73936ce0f5b498d8'
+        auth_token = '24896cfac2d822cefab9ce8cdd5b8c80'
         client = Client(account_sid, auth_token)
 
         message = client.messages.create(
         from_='+18582603816',
         body=f'Your Emdad OTP code is {sudo.assigned_otp}',
-        to='+962795017656'
+        to= sudo.phone_number
         )
 
         print(message.sid)
-        print("--------",f'Your Emdad OTP code is {sudo.assigned_otp}',"-------")
+        print("--------",f'Your Emdad OTP code is {sudo.assigned_otp}',"-------"f'user phone number {sudo.phone_number}')
