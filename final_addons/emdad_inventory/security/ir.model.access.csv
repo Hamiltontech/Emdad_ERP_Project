@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_emdad_warehouse,Emdad Warehouse Access,model_emdad_warehouse,base.group_user,1,1,1,0
+access_emdad_warehouse_location,Emdad Warehouse Location Access,model_emdad_warehouse_location,base.group_user,1,1,1,0
+access_emdad_warehouse_location_usage,Emdad Warehouse Location Usage Access,model_emdad_warehouse_location_usage,base.group_user,1,1,1,0
+access_emdad_warehouse_quants,Emdad Warehouse Quants Access,model_emdad_warehouse_quants,base.group_user,1,1,1,0
+access_emdad_warehouse_batches,Emdad Warehouse Batches Access,model_emdad_warehouse_batches,base.group_user,1,1,1,0
+access_emdad_warehouse_quants_lines,Emdad Warehouse Quants Lines Access,model_emdad_warehouse_quants_lines,base.group_user,1,1,1,0
+access_emdad_warehouse_scrap,Emdad Warehouse Scrap Access,model_emdad_warehouse_scrap,base.group_user,1,1,1,0

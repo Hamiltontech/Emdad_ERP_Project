@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<emdad>
-    <data>
-        <record id="base.user_root" model="res.users">
-            <field name="emdadbot_state">disabled</field>
-        </record>
-    </data>
-</emdad>

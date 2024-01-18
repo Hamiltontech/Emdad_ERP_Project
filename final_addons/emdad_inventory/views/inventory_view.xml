@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="utf-8"?>
+<emdad>
+<!-- FORMS -->
+    <record id="view_emdad_warehouse_form" model="ir.ui.view">
+        <field name="name">emdad.warehouse.view.form</field>
+        <field name="model">emdad.warehouse</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                    <h1>
+                        <field name="name"/>
+                        </h1>
+                    </div>
+                    <group string="Warehouse Information">
+                    <field name="short_name"/>
+                    <field name="warehouse_relation"/>
+                    <field name="total_qty"/>
+                    </group>
+                    <group string="Warehouse Locations">
+                        <field name="locations" widget="one2many_list">
+                            <tree editable="bottom">
+                                <field name="name"/>
+                                <field name="location_type"/>
+                                <field name="used_delivery"/>
+                                <field name="used_reciepts"/>
+                                <field name="location_usage"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_emdad_locations_form" model="ir.ui.view">
+        <field name="name">emdad.locations.view.form</field>
+        <field name="model">emdad.warehouse.location</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                    <group string="Location Information">
+                    <group>
+                        <field name="related_warehouse"/>
+                        <field name="location_type"/>
+                        <field name="parent_location"/>
+                        <field name="location_usage"/>
+                                                        <field name="quantity"/>
+
+                    </group>
+                    <group>
+                        <field name="used_delivery"/>
+                        <field name="used_reciepts"/>
+        
+                    </group>
+                    </group>
+                    <field name="products" widget="one2many_list">
+                        <tree editable="bottom" group="product_id">
+                            <field name="product_id"/>
+                            <field name="barcode"/>
+                            <field name="expiary"/>
+                            <field name="batch"/>
+                            <field name="batch_status"/>
+                            <field name="counted_qty"/>
+                        </tree>
+                    </field>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_emdad_warehouse_quants_form" model="ir.ui.view">
+        <field name="name">emdad.warehouse.quants.view.form</field>
+        <field name="model">emdad.warehouse.quants</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                    <group string="Adjustement Information">
+                        <field name="adjustment_date"/>
+                        <field name="purpose"/>
+                        <field name="location"/>
+                    </group>
+                    <field name="quants_lines" widget="one2many_list" context="{'default_location' : location}">
+                                                <tree editable="bottom">
+
+                        <field name="product_id"/>
+                        <field name="barcode"/>
+                        <field name="expiary"/>
+                        <field name="batch_status"/>
+                        <field name="batch" context="{'default_expiary': expiary, 'default_product_id': product_id}"/>
+                        <field name="location"/>
+                        <field name="counted_qty"/>
+                        <field name="metric"/>
+                        <field name="packaging"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="emdad_warehouse_quants_lines_view_tree" model="ir.ui.view">
+        <field name="name">emdad.warehouse.quants.lines.view.tree</field>
+        <field name="model">emdad.warehouse.quants.lines</field>
+        <field name="arch" type="xml">
+            <tree string="">
+            <field name="location"/>
+            <field name="product_id"/>
+            <field name="barcode"/>
+            <field name="batch"/>
+            <field name="expiary"/>
+            <field name="batch_status"/>
+            <field name="counted_qty"/>
+            <field name="unit_cost" sum="Total Cost"/>
+            <field name="related_adjustement"/>
+            </tree>
+        </field>
+    </record>
+    <record id="emdad_warehouse_batches_view_form" model="ir.ui.view">
+        <field name="name">emdad_warehouse_batches.view.form</field>
+        <field name="model">emdad.warehouse.batches</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                <div class="oe_title">
+                    <h1><field name="name"/></h1>
+                </div>
+                <group>
+                    <group string="Batch Information">
+                        <field name="gtin"/>
+                        <field name="expiary"/>
+                        <field name="product_id"/>
+                        <field name="origin"/>
+                    </group>
+                    <group string="Batch Analytics">
+                        <field name="status"/>
+                         <field name="available"/>
+                         <field name="average_cost"/>
+                    </group>
+                    <field name="counts"/>
+                </group>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="emdad_warehouse_scrap_view_form" model="ir.ui.view">
+        <field name="name">emdad_warehouse_scrap.view.form</field>
+        <field name="model">emdad.warehouse.scrap</field>
+        <field name="arch" type="xml">
+            <form string="">
+            <header>
+                <field name="status" widget="statusbar" statusbar_visible="draft,approved,done,cancel"/>
+            </header>
+                <sheet>
+                    <div class="oe_title">
+                    <h1>
+                        <field name="name"/>
+                    </h1>
+                    </div>
+                    <group string="Scrap Action Information">
+                        <group>
+                            <field name="date"/>
+                            <field name="reason"/>
+                            <field name="explain"/>
+                            <field name="location" domain="[('location_type', '=', 'scrap')]"/>
+                        </group>
+                        <group>
+                            <field name="status"/>
+                        </group>
+                        
+                    </group>
+                    <field name="scrap" context="{'default_location': location}" widget="one2many_list">
+    
+                                <tree editable="bottom">
+                                    <field name="barcode"/>
+                                    <field name="product_id"/>
+                                    <field name="location"/>
+                                    <field name="batch"/>
+                                    <field name="counted_qty"/>
+
+                                    
+                                </tree>
+                        </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- kanban -->
+<record id="emdad_warehouse_view_kanban" model="ir.ui.view">
+    <field name="name">emdad_warehouse.view.kanban</field>
+    <field name="model">emdad.warehouse</field>
+    <field name="arch" type="xml">
+        <kanban class="o_res_partner_kanban">
+            <templates>
+                <t t-name="kanban-box">
+                    <div class="oe_kanban_global_click">
+                        <div class="oe_kanban_card">
+                            <div class="oe_kanban_image" t-attf-style="background-image: url('/web/image?model=emdad.warehouse&amp;field=image&amp;id=#{record.id}&amp;unique=1')">
+                            </div>
+                            <div class="oe_kanban_details">
+                                 <!-- <i class="fa fa-building fa-3x" style="color: #eeee; margin: auto;"></i> -->
+                                <strong class="oe_kanban_title"><field name="name"/></strong>
+                                <p><field name="short_name"/></p>
+                                <hr></hr>
+                                <feild name="locations_count"/> locations
+                                <p><field name="total_qty"/> Total Quantity</p>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </templates>
+        </kanban>
+    </field>
+</record>
+<record id="emdad_warehouse_batches_view_kanban" model="ir.ui.view">
+    <field name="name">emdad_warehouse_batches.view.kanban</field>
+    <field name="model">emdad.warehouse.batches</field>
+    <field name="arch" type="xml">
+        <kanban>
+            <templates>
+                <t t-name="kanban-box">
+                    <div class="oe_kanban_global_click">
+                        <div class="oe_kanban_card" style="text-align: center;">
+                            <div class="oe_kanban_details">
+                                <field name="status" widget="badge"/>
+                                <hr></hr>
+                                <h4><field name="name"/></h4>
+                                <hr></hr>
+                                <p>
+                                    Total Quantity : <field name="available"/>
+                                </p>
+                                <p>
+                                    Average Cost : <field name="average_cost"/>
+                                </p>
+                                <p>
+                                    Product : <field name="product_id"/>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </templates>
+        </kanban>
+    </field>
+</record>
+
+
+    <!-- WINDOWS -->
+     <record model="ir.actions.act_window" id="warehouse_emdad_windows">
+        <field name="name">Warehouses</field>
+        <field name="res_model">emdad.warehouse</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
+     <record model="ir.actions.act_window" id="locations_emdad_windows">
+        <field name="name">Locations</field>
+        <field name="res_model">emdad.warehouse.location</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
+    <record model="ir.actions.act_window" id="quants_emdad_windows">
+        <field name="name">Quantities Management</field>
+        <field name="res_model">emdad.warehouse.quants</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
+     <record model="ir.actions.act_window" id="warehouse_quantities_windows">
+        <field name="name">Products Quantities</field>
+        <field name="res_model">emdad.warehouse.quants.lines</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+    </record>    
+    <record model="ir.actions.act_window" id="batches_management_windows">
+        <field name="name">Batches Management</field>
+        <field name="res_model">emdad.warehouse.batches</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
+    <record model="ir.actions.act_window" id="scrap_actions_windows">
+        <field name="name">Scrap Actions</field>
+        <field name="res_model">emdad.warehouse.scrap</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
+    <!-- MENUS -->
+    <menuitem id="emdad_warehouses_menu" name="Warehouses"/>
+    <menuitem id="emdad_warehouses_view_menu"
+              name="Warehouses Management"
+              parent="emdad_warehouses_menu"
+              sequence="2"
+              action="emdad_inventory.warehouse_emdad_windows"/>
+    <menuitem id="emdad_locations_view_menu"
+              name="Locations Management"
+              parent="emdad_warehouses_menu"
+              sequence="2"
+              action="emdad_inventory.locations_emdad_windows"/>
+    <menuitem id="emdad_quants_view_menu"
+              name="Quantities Management"
+              parent="emdad_warehouses_menu"
+              sequence="2"
+              action="emdad_inventory.quants_emdad_windows"/>
+    <menuitem
+        id="batch_management_menu"
+        name="Batches"
+        action="emdad_inventory.batches_management_windows"
+        parent="emdad_warehouses_menu"
+        sequence="4"/>
+    <menuitem id="emdad_products_quants_view_menu"
+              name="Quantities"
+              parent="emdad_warehouses_menu"
+              sequence="2"
+              action="emdad_inventory.warehouse_quantities_windows"/>
+    <menuitem
+        id="warehouse_actions_menu"
+        name="Actions"
+        parent="emdad_warehouses_menu"
+        sequence="10"/>
+        <menuitem
+            id="emdad_warehouse_scrap_menu"
+            name="Scrap Actions"
+            action="scrap_actions_windows"
+            parent="warehouse_actions_menu"
+            sequence="10"/>
+
+</emdad>

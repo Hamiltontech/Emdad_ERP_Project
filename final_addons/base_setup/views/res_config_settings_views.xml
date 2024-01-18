@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<emdad>
+        <record id="res_config_settings_view_form" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.base.setup</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="0"/>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form" position="inside">
+                    <field name="is_root_company" invisible="1"/>
+                    <app data-string="General Settings" string="General Settings" name="general_settings" logo="/base/static/description/settings.png">
+
+                        <div id="invite_users">
+                            <block title="Users" name="users_setting_container">
+                                <setting id="invite_users_setting">
+                                    <widget name='res_config_invite_users'/>
+                                </setting>
+                                <setting id="active_user_setting">
+                                    <span class="fa fa-lg fa-users" aria-label="Number of active users"/>
+                                    <field name='active_user_count' class="w-auto ps-3 fw-bold"/>
+                                    <span class='o_form_label' invisible="active_user_count &gt; 1">
+                                        Active User
+                                    </span>
+                                    <span class='o_form_label' invisible="active_user_count &lt;= 1">
+                                        Active Users
+                                    </span>
+                                    <a href="https://www.emdad.com/documentation/17.0/applications/general/users.html" title="Documentation" class="o_doc_link" target="_blank"></a>
+                                    <br/>
+                                    <button name="%(base.action_res_users)d" icon="oi-arrow-right" type="action" string="Manage Users" class="btn-link o_web_settings_access_rights"/>
+                                </setting>
+                            </block>
+                        </div>
+
+                        <div id="languages">
+                            <block title="Languages" name="languages_setting_container">
+                                <setting id="languages_setting">
+                                    <!-- TODO This is not an ideal solution but it looks ok on the interface -->
+                                    <div class="w-50">
+                                        <field name="language_count" class="w-auto ps-1 fw-bold"/>
+                                        <span class='o_form_label' invisible="language_count &gt; 1">
+                                            Language
+                                        </span>
+                                        <span class='o_form_label' invisible="language_count &lt;= 1">
+                                            Languages
+                                        </span>
+                                    </div>
+                                    <div class="mt8">
+                                        <button name="%(base.action_view_base_language_install)d" icon="oi-arrow-right" type="action" string="Add Languages" class="btn-link"/>
+                                    </div>
+                                    <div class="mt8" groups="base.group_no_one">
+                                        <button name="%(base.res_lang_act_window)d" icon="oi-arrow-right" type="action" string="Manage Languages" class="btn-link"/>
+                                    </div>
+                                </setting>
+                            </block>
+                        </div>
+
+                        <div id="companies">
+                            <block title="Companies" name="companies_setting_container">
+                                <field name="company_id" invisible="1"/>
+                                <setting id="company_details_settings">
+                                    <field name="company_name" nolabel="1" class="fw-bold"/>
+                                    <br/>
+                                    <field name="company_informations" class="text-muted" style="width: 90%;"/>
+                                    <br/>
+                                    <button name="open_company" icon="oi-arrow-right" type="object" string="Update Info" class="btn-link"/>
+                                </setting>
+                                <setting id="companies_setting">
+                                    <field name='company_count' nolabel="1" class="w-auto ps-1 fw-bold"/>
+                                    <span class='o_form_label' invisible="company_count &gt; 1">
+                                        Company
+                                    </span>
+                                    <span class='o_form_label' invisible="company_count &lt;= 1">
+                                        Companies
+                                    </span>
+                                    <br/>
+                                    <div class="mt8">
+                                        <button name="%(base.action_res_company_form)d" icon="oi-arrow-right" type="action" string="Manage Companies" class="btn-link"/>
+                                    </div>
+                                </setting>
+                                <setting id="document_layout_setting" string="Document Layout" help="Choose the layout of your documents" company_dependent="1">
+                                    <div class="content-group">
+                                        <div class="mt16" groups="base.group_no_one">
+                                            <label for="external_report_layout_id" string="Layout" class="col-3 col-lg-3 o_light_label"/>
+                                            <field name="external_report_layout_id" domain="[('type','=', 'qweb')]" class="oe_inline"/>
+                                        </div>
+                                            <button name="%(web.action_base_document_layout_configurator)d" string="Configure Document Layout" type="action" class="oe_link" icon="oi-arrow-right"/>
+                                            <br groups="base.group_no_one"/>
+                                            <button name="edit_external_header" string="Edit Layout" type="object" class="oe_link" groups="base.group_no_one" icon="oi-arrow-right"/>
+                                            <br groups="base.group_no_one"/>
+                                            <button name="%(web.action_report_externalpreview)d" string="Preview Document" type="action" class="oe_link" groups="base.group_no_one" icon="oi-arrow-right"/>
+                                    </div>
+                                </setting>
+                                <field name="company_id" invisible="1"/>
+                            </block>
+                        </div>
+                        
+
+                      
+
+                        <div id='about'>
+                            <block title="About" name="about_setting_container">
+                                <setting id='appstore'>
+                                    <div class="d-flex">
+                                        Thank you for using Emdad Platform, this platform is dedicated to provide ease of management and control for your company. Feel free to contact us if you have any questions at support@emdadplatform.com
+                                    </div>
+                                </setting>
+                            </block>
+                        </div>
+                    </app>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="action_general_configuration" model="ir.actions.act_window">
+            <field name="name">Settings</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'general_settings', 'bin_size': False}</field>
+        </record>
+
+        <menuitem
+            id="menu_config"
+            name="General Settings"
+            parent="base.menu_administration"
+            sequence="0"
+            action="action_general_configuration"
+            groups="base.group_system"/>
+
+</emdad>

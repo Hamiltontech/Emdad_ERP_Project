@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_emdad_contacts_internal,user_group_internal,model_emdad_contacts,base.group_user,1,1,1,1
+access_emdad_cities_internal,user_group_internal,model_emdad_cities,base.group_user,1,1,1,1
+access_emdad_countries_internal,user_group_internal,model_emdad_countries,base.group_user,1,1,1,1

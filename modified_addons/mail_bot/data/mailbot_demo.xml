@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<emdad>
-    <data>
-        <!-- Disable emdadbot on admin so that devs don't hate it -->
-        <record id="base.user_admin" model="res.users">
-            <field name="emdadbot_state">disabled</field>
-        </record>
-    </data>
-</emdad>

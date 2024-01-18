@@ -4,6 +4,7 @@
 import base64
 import logging
 import warnings
+import requests
 
 from emdad import api, fields, models, tools, _, Command, SUPERUSER_ID
 from emdad.exceptions import ValidationError, UserError
@@ -73,10 +74,50 @@ class Company(models.Model):
     color = fields.Integer(compute='_compute_color', inverse='_inverse_color')
     layout_background = fields.Selection([('Blank', 'Blank'), ('Geometric', 'Geometric'), ('Custom', 'Custom')], default="Blank", required=True)
     layout_background_image = fields.Binary("Background Image")
+    crEntityNumber = fields.Char(string="Entity Number")
+    cr_number = fields.Char(string="Company CR")
+    district = fields.Char(string="District")
     _sql_constraints = [
         ('name_uniq', 'unique (name)', 'The company name must be unique!')
     ]
+    @api.onchange('cr_number')
+    def on_change_cr_number(self):
+        if self.cr_number:
+            api_url = f'https://api.wathq.sa/v5/commercialregistration/info/{self.cr_number}'
+            headers = {
+                'accept': 'application/json',
+                'apiKey': 'g36VC0YZOQR7kS4HgaH9X1WAX4rDgJlW'  
+            }
 
+            response = requests.get(api_url, headers=headers)
+
+            if response.status_code == 200:
+                cr_info = response.json()
+               
+                self.name = cr_info.get('crName', '')
+                self.crEntityNumber = cr_info.get('crEntityNumber', '')
+                api_url_address = f'https://api.wathq.sa/v5/commercialregistration/address/{self.cr_number}'
+                headers_address = {
+                    'accept': 'application/json',
+                    'apiKey': 'g36VC0YZOQR7kS4HgaH9X1WAX4rDgJlW'  # Replace with your API key
+                }
+
+                response_address = requests.get(api_url_address, headers=headers_address)
+
+                if response_address.status_code == 200:
+                    address_info = response_address.json().get('general', {})
+
+                    self.website = address_info.get('website', '')
+                    self.street2 = address_info.get('address', '')
+                    self.email = address_info.get('email', '')
+                    self.zip = address_info.get('zipcode', '')
+                    self.phone = address_info.get('telephone1', '')
+                    self.street = response_address.json().get('national', {}).get('unitNumber', '')
+                    self.district = response_address.json().get('national', {}).get('districtName', '')
+                else:
+                    pass
+            else:
+                pass
     def init(self):
         for company in self.search([('paperformat_id', '=', False)]):
             paperformat_euro = self.env.ref('base.paperformat_euro', False)

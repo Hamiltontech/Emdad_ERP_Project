@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<emdad>
+   <record id="emdad_procurement_view_form" model="ir.ui.view">
+    <field name="name">emdad_procurement.view.form</field>
+    <field name="model">emdad.procurement</field>
+    <field name="arch" type="xml">
+        <form string="">
+        <header>
+            <button string="Approve" type="object" name="approve_quote" invisible = "status == 'active'"/>
+            <button string="Publish" type="object" name="publish_quote" invisible = "published == True"/>
+            <button string="Close Order" type="object" name="close_quote" invisible = "status != 'active'"/>
+            <button string="Recieve" type="object" name="recieved_process" invisible = "in_recieve == True"/>
+            <button string="Create Quantities" type="object" name="create_inventory_input" invisible = " status != 'recieve'"/>
+            <field name="status" widget="statusbar" statusbar_visible="pending,active,closed,expired,recieve" />
+        </header>
+            <sheet>
+            <div class="oe_title">
+            Procurement ID 
+            <h1>
+                <field name="name"/>
+            </h1>
+            </div>
+                <group string="Request Information">
+                <group>
+                <field name="effective_date"/>
+                <field name="exp_quote"/>
+                <field name="operation_type"/>
+                <field name="process_type"/>
+                <field name="payment_type"/>
+                <field name="distribution_type"/>
+                <field name="single_location" invisible = "distribution_type != 'single'" domain="[('used_reciepts', '=', True)]"/>
+                <field name="status"/>
+                <field name="published"/>
+                <field name="is_multiple" invisible="1"/>
+                <field name="all_info" invisible="1"/>
+                <field name="in_recieve"/>
+                </group>
+                 <group>
+                <field name="vendor" domain="[('contact_type', '=', 'vendor')]" invisible = "process_type != 'direct'"/>
+                <field name="vendor_phone" widget="phone" invisible = "process_type != 'direct'"/>
+                </group>
+                <group string="Request Finances">
+                <group>
+                    <field name="total_before_discount"/>
+                    <field name="total_discount"/>
+                    <field name="total_amount"/>
+                </group>
+                    
+                </group>
+            <field name="procurement_lines" widget="one2many_list" invisible = "all_info != True" context="{'default_vendor' : vendor, 'default_location': single_location, 'default_is_multiple': is_multiple}">
+                            <tree editable="bottom">
+                                <field name="barcode"/>
+                                <field name="product_id"/>
+                                <field name="attach"/>
+                                <field name="packaging"/>
+                                <field name="request_qty"/>
+                                <field name="batch" invisible = "in_recieve != True" widget="many2one_new" options="{'no_open': True}"/>
+                                <field name="recieved_qty" invisible = "in_recieve != True"/>
+                                <field name="difference" invisible = "in_recieve != True"/>
+                                 <field name="recieve_status" widget="badge" invisible = "in_recieve != True"/>
+                                <field name="metric"/>
+                                <field name="product_cost"/>
+                                <field name="discount"/>
+                                <field name="in_recieve" optional="hide"/>
+                                <field name="total"/>
+                                <field name="final_total"/>
+                                <field name="location" invisible = "is_multiple != True"/>
+                                <field name="vendor" optional="hide"/>
+                                <field name="is_multiple" optional="hide"/>
+                            </tree>
+                        </field>                </group>
+            </sheet>
+        </form>
+    </field>
+   </record>
+
+    <record id="emdad_procurement_view_kanban" model="ir.ui.view">
+        <field name="name">emdad_procurement_kanban.view.kanban</field>
+        <field name="model">emdad.procurement</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click" style="text-align: center;">
+                        <field name="operation_type" widget="badge"/>
+                        <hr></hr>
+                        <field name="name"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="procurement_management_windows">
+        <field name="name">Procurement</field>
+        <field name="res_model">emdad.procurement</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
+
+    <menuitem id="emdad_procurement_menu" name="Procurement"/>
+    
+    <menuitem id="emdad_procurement_orders_menu"
+              name="Procurement Orders"
+              parent="emdad_procurement_menu"
+              sequence="2"
+              action="emdad_procurement.procurement_management_windows"/>
+</emdad>
