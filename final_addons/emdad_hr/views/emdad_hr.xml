@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<emdad>
+<!-- form     -->
+<record id="emdad_hr_view_form" model="ir.ui.view">
+    <field name="name">emdad_hr.view.form</field>
+    <field name="model">emdad.hr</field>
+    <field name="arch" type="xml">
+        <form string="">
+        <header>
+            <button string="Deactivate Employee" name="status_inactive" type="object" invisible="status == 'not'"/>
+            <button string="Activate Employee" name="status_active" type="object" invisible="status == 'active'"/>
+        </header>
+            <sheet>
+            <field name="status" widget="badge"/>
+            <div class="oe_title">
+            <h1>
+                <field name="name"/>
+            </h1>
+            </div>
+                <group string="Definitions">
+                <group name="name" >
+<field name="image" widget="image" options="{'size': (150, 150)}"/>
+                    
+                </group>
+                <group name="name">
+                    <field name="emp_id"/>
+                     <field name="emdad_id"/>
+                </group> 
+                </group>
+                <group name="basic" string="Basic Information">
+                    <group string="Communication">
+                        <field name="phone" widget="phone"/>
+                        <field name="personal_email" widget="email"/>
+                        <field name="emdad_user" widget="selection_create" context="{'default_login' : personal_email, 'default_name' : name, 'default_mobile': phone}"/>
+                    </group>
+                    <group string="Address">
+                        <field name="building"/>
+                        <field name="street"/>
+                        <field name="city"/>
+                        <field name="country"/>
+                    </group>
+                </group>
+                <group>
+                    <group name="name" string="Personal">
+                        <field name="dob"/>
+                        <field name="age"/>
+                        <field name="id_type"/>
+                        <field name="document_id"/>
+                        <field name="document"/>
+                        <field name="expiary"/>
+                        <field name="doc_status" widget="badge"/>
+                    </group>
+                    <group name="name" string="Work">
+                        <field name="active_contract"/>
+                        <field name="position"/>
+                        <field name="department"/>
+                        <field name="manager"/>
+                        <field name="end_date"/>
+                        <field name="years"/>
+                        <field name="status"/>
+                        <field name="salary"/>
+                        <field name="cv"/>
+                    </group>
+                </group> 
+                <notebook>
+                    <page name="education" string="Education Profile">
+                        <field name="education" widget="one2many_list">
+                            <tree editable="bottom">
+                                <field name="major"/>
+                                <field name="school"/>
+                                <field name="country"/>
+                                <field name="graduation_year"/>
+                                <field name="certificate"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page name="work" string="Work History">
+                        <field name="work" widget="one2many_list">
+                            <tree editable="bottom">
+                                <field name="name"/>
+                                <field name="from_date"/>
+                                <field name="till_date"/>
+                                <field name="departure_reason"/>
+                                <field name="position"/>
+                                <field name="salary"/>
+                                <field name="experience_years"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page name="work" string="Contracts">
+                        <field name="contracts" widget="one2many_list">
+                            <tree>
+                                <field name="name"/>
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                                <field name="job"/>
+                                <field name="status"/>
+                            </tree>
+                        </field>
+                    </page>
+            </notebook>
+
+            </sheet>
+        </form>
+    </field>
+</record>
+<record id="emdad_hr_department_view_form" model="ir.ui.view">
+    <field name="name">emdad_hr_department.view.form</field>
+    <field name="model">emdad.hr.department</field>
+    <field name="arch" type="xml">
+        <form string="">
+            <sheet>
+            <div class="oe_title">
+            <h1>
+                <field name="name"/>
+            </h1>
+            </div>
+                <group string="Department Information">
+                <field name="parent_department"/>
+                <field name="manager"/>
+                </group>
+                <field name="employees"/>
+            </sheet>
+        </form>
+    </field>
+</record>
+<record id="emdad_hr_contract_view_form" model="ir.ui.view">
+    <field name="name">emdad_hr_contract.view.form</field>
+    <field name="model">emdad.hr.contract</field>
+    <field name="arch" type="xml">
+        <form string="">
+            <sheet>
+            <header>
+                <field name="status" widget="badge"/>
+            </header>
+            <div class="oe_title">
+                <h1>   
+                    <field name="name"/>
+                </h1>
+            </div>
+                <group string="Contract Information">
+                <group>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                    <field name="related_employee"/>
+                    <field name="over_time"/>
+                    <field name="bank" context="{'default_related_contract': id}"/>
+                    </group>
+                    <group>
+                    <field name="contract_type"/>
+                    <field name="job"/>
+                    <field name="related_department"/>
+                    <field name="related_manager"/>
+                    <field name="total_salary"/>
+                    <field name="total_hours"/>
+                </group>
+                </group>
+               
+                <notebook>
+                    <page name="salary_list" string="Salary Structure">
+                        <field name="salary" widget="one2many_list">
+                            <tree>
+                                <field name="name"/>
+                                <field name="structure"/>
+                                <field name="amount"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page name="work_list" string="Working Hours">
+                        <field name="work_days" widget="one2many_list">
+                            <tree editable="bottom">
+                                <field name="name"/>
+                                <field name="day"/>
+                                <field name="start" widget="float_time"/>
+                                <field name="break_time" widget="float_time"/>
+                                <field name="end" widget="float_time"/>
+                                <field name="working_hours"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page name="descriptiopn" string="Job Description">
+                       <field name="description"/>
+                    </page>
+                </notebook>
+                
+            </sheet>
+        </form>
+    </field>
+</record>
+<record id="emdad_hr_salary_view_form" model="ir.ui.view">
+    <field name="name">emdad_hr_salary.view.form</field>
+    <field name="model">emdad.hr.salary</field>
+    <field name="arch" type="xml">
+        <form string="">
+            <sheet>
+            <div class="oe_title">
+            <h1>
+                <field name="name"/>
+            </h1>
+            </div>
+                <group string="Salary Structure Information">
+                    <group>
+                        <field name="structure"/>
+                        <field name="deduction" invisible="structure != 'deduction'"/>
+                        <field name="attendance"/>
+                        <field name="amount"/>
+                    </group>
+                    <group>
+                        <field name="related_contract"/>
+                        <field name="related_employee"/>
+                    </group>
+                    
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+<!--kanban-->
+<record id="emdad_hr_view_kanban" model="ir.ui.view">
+    <field name="name">emdad_hr.view.kanban</field>
+    <field name="model">emdad.hr</field>
+    <field name="arch" type="xml">
+        <kanban>
+            <templates>
+                <t t-name="kanban-box">
+                    <div class="oe_kanban_global_click">
+                        <div class="oe_kanban_card" style="text-align: center;">
+                        <div class="oe_kanban_details">
+                        <field name="image" widget="image" options="{'size': (150, 150)}"/>
+                        <hr></hr>
+                        <h4><field name="name"/></h4>
+                        </div>  
+                        </div>
+                        </div>
+                </t>
+            </templates>
+        </kanban>
+    </field>
+</record>
+<!-- action-->
+<record model="ir.actions.act_window" id="emdad_hr_windows">
+        <field name="name">Human Resources</field>
+        <field name="res_model">emdad.hr</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
+    <record model="ir.actions.act_window" id="emdad_hr_contract_windows">
+        <field name="name">Contracts Management</field>
+        <field name="res_model">emdad.hr.contract</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
+     <record model="ir.actions.act_window" id="emdad_hr_jobs_windows">
+        <field name="name">Job Positions Management</field>
+        <field name="res_model">emdad.hr.position</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
+     <record model="ir.actions.act_window" id="emdad_hr_departments_windows">
+        <field name="name">Departments Management</field>
+        <field name="res_model">emdad.hr.department</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
+
+    
+<!--MEnu-->
+<menuitem
+    id="emdad_hr_menu"
+    name="Human Resources"
+    sequence="10"/>
+    <menuitem
+        id="emdad_hr_profile_menu"
+        name="Human Resources"
+        action="emdad_hr_windows"
+        parent="emdad_hr_menu"
+        sequence="10"/>
+        <menuitem
+        id="emdad_hr_contract_manage_menu"
+        name="Contracts"
+        parent="emdad_hr_menu"
+        sequence="10"/>
+             <menuitem
+            id="emdad_hr_contract_jobs_menu"
+            name="Job Positions"
+            action="emdad_hr_jobs_windows"
+            parent="emdad_hr_contract_manage_menu"
+            sequence="10"/>
+            <menuitem
+            id="emdad_hr_contract_management_menu"
+            name="Contracts"
+            action="emdad_hr_contract_windows"
+            parent="emdad_hr_contract_manage_menu"
+            sequence="10"/>
+        
+         <menuitem
+        id="emdad_hr_contract_company_menu"
+        name="Company Structure"
+        parent="emdad_hr_menu"
+        sequence="10"/>
+            <menuitem
+            id="emdad_hr_contract_profile_menu"
+            name="Departments"
+            action="emdad_hr_departments_windows"
+            parent="emdad_hr_contract_company_menu"
+            sequence="10"/>
+
+</emdad>

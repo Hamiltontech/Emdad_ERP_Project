@@ -29,8 +29,8 @@ from emdad.addons.base.models.assetsbundle import AssetsBundle
 from ..models.ir_attachment import SUPPORTED_IMAGE_MIMETYPES
 
 logger = logging.getLogger(__name__)
-DEFAULT_LIBRARY_ENDPOINT = 'https://media-api.odoo.com'
-DEFAULT_OLG_ENDPOINT = 'https://olg.api.odoo.com'
+DEFAULT_LIBRARY_ENDPOINT = 'https://media-api.emdad.com'
+DEFAULT_OLG_ENDPOINT = 'https://olg.api.emdad.com'
 
 
 class Web_Editor(http.Controller):
