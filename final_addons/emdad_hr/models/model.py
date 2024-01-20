@@ -9,7 +9,8 @@ class EmdadHR(models.Model):
     name = fields.Char(string="Employee Name")
     emp_id = fields.Integer(string="Employee ID")
     emdad_id = fields.Integer(string="Emdad ID")
-    emdad_user = fields.Many2one("res.users", string="Related User")
+    emdad_user = fields.Many2one("res.users", related="active_contract.emdad_user",string="Related User")
+    related_company = fields.Many2one("res.company", related="active_contract.related_company", string="Related Company")
     #basic Information
     image = fields.Binary(string="Image")
     phone = fields.Char(string="Phone Number", Unique=True)
@@ -26,6 +27,9 @@ class EmdadHR(models.Model):
     document = fields.Binary(string="ID Copy")
     expiary = fields.Date(string="Expiary Date")
     doc_status = fields.Selection([('not','Not Active'), ('active','Active')], string="Document Status", compute="_doc_status")
+    nationality = fields.Many2one("res.country", string="Nationality")
+    gosi_number = fields.Char(string="GOSI #")
+    gosi_issue = fields.Date(string="GOSI Issuance")
 
     cv = fields.Binary(string="CV")
     #education
@@ -177,7 +181,10 @@ class EmdadHRContracts(models.Model):
     total_hours = fields.Float(string="Total Hours / Week", compute="_get_hours")
     over_time = fields.Selection([('no','No Overtime'),('can','Overtime Without Approval'),('approval','Overtime With Approval')], string="Overtime Status")
     bank = fields.Many2one("emdad.hr.bank", string="Bank Information")
-
+    emdad_user = fields.Many2one("res.users", string="Emdad User")
+    related_company = fields.Many2one("res.company", string="Related Company")
+    #rules
+    rules = fields.One2many("emdad.hr.user", "related_contract", string="Rules")
     @api.depends('work_days')
     def _get_hours(self):
         for record in self:
@@ -206,6 +213,19 @@ class EmdadHRContracts(models.Model):
             else:
                 record.status = 'not'
 
+class EmdadUserRules(models.Model):
+    _name="emdad.hr.user"
+
+    name = fields.Char(string="Rule")
+    app = fields.Many2one("ir.model", string="Application")
+    view = fields.Boolean(string="View")
+    read_app = fields.Boolean(string="Read")
+    write = fields.Boolean(string="Write")
+    edit = fields.Boolean(string="Edit")
+    related_contract = fields.Many2one("emdad.hr.contract", string="Contract")
+    related_employee = fields.Many2one("emdad.hr", related="related_contract.related_employee", string="Related Employee")
+    related_user = fields.Many2one("res.users", related="related_contract.related_employee.emdad_user", string="User")
+    
 class EmdadHRBank(models.Model):
     _name="emdad.hr.bank"
 

@@ -25,6 +25,7 @@
                 <group name="name">
                     <field name="emp_id"/>
                      <field name="emdad_id"/>
+                     <field name="related_company"/>
                 </group> 
                 </group>
                 <group name="basic" string="Basic Information">
@@ -48,6 +49,9 @@
                         <field name="document_id"/>
                         <field name="document"/>
                         <field name="expiary"/>
+                        <field name="nationality"/>
+                        <field name="gosi_number"/>
+                        <field name="gosi_issue"/>
                         <field name="doc_status" widget="badge"/>
                     </group>
                     <group name="name" string="Work">
@@ -145,6 +149,8 @@
                     <field name="related_employee"/>
                     <field name="over_time"/>
                     <field name="bank" context="{'default_related_contract': id}"/>
+                    <field name="related_company"/>
+                    <field name="emdad_user"/>
                     </group>
                     <group>
                     <field name="contract_type"/>
@@ -175,6 +181,17 @@
                                 <field name="break_time" widget="float_time"/>
                                 <field name="end" widget="float_time"/>
                                 <field name="working_hours"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page name="work_rules" string="Emdad Rules">
+                        <field name="rules" widget="one2many_list">
+                            <tree editable="bottom">
+                                <field name="app"/>
+                                <field name="view"/>
+                                <field name="read_app"/>
+                                <field name="write"/>
+                                <field name="edit"/>
                             </tree>
                         </field>
                     </page>
