@@ -5,6 +5,7 @@ from emdad.exceptions import ValidationError
 
 class EmdadHR(models.Model):
     _name="emdad.hr"
+    _description = "HR----test"
 
     name = fields.Char(string="Employee Name")
     emp_id = fields.Integer(string="Employee ID")

@@ -240,12 +240,18 @@
         <kanban>
             <templates>
                 <t t-name="kanban-box">
-                    <div class="oe_kanban_global_click">
+                    <div class="oe_kanban_global_click" style="border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
                         <div class="oe_kanban_card" style="text-align: center;">
-                        <div class="oe_kanban_details">
-                        <field name="image" widget="image" options="{'size': (150, 150)}"/>
+                        <field name="status" widget="badge" style="position: absolute; top: 10px; right: 10px;"/>
+                        <div class="oe_kanban_details" >
+                        <field name="image" widget="image" options="{'size': (150, 215)}" style="min-height: 220px; padding-top: 25px; display: flex; flex-direction: column; justify-content: center;"/>
                         <hr></hr>
-                        <h4><field name="name"/></h4>
+                        <h3 style="margin-top: 10px; color: #333; text-align: center;"><field name="name"/></h3>
+                        <p style="margin: 10px 0; color: #666; text-align: center;"><field name="position"/></p>
+                        <ul style="list-style: none; padding: 0; margin: 0; text-align: center;">
+                            <li style="display: inline-block; margin-right: 15px; color: #888;">&#x1F4E7; : <field name="personal_email"/></li>
+                            <li style="display: inline-block; color: #888;">&#9990; : <field name="phone"/></li>
+                        </ul>
                         </div>  
                         </div>
                         </div>

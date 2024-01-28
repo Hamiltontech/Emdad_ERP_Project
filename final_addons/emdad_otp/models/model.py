@@ -1,4 +1,4 @@
 from emdad import models, fields, api
 
-class EmdadOTP(models.Mode):
-    _n
+# class EmdadOTP(models.Mode):
+#     _n
