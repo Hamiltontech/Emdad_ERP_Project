@@ -218,6 +218,7 @@ class Users(models.Model):
         else:
             print(sudo.otp_last_generated_time)
             print(sudo.assigned_otp)
+        print("--------",f'Your Emdad OTP code is {sudo.assigned_otp}',"-------"f'user phone number {sudo.phone_number}')
 
     def send_otp_sms(self):
         sudo = self.sudo()
