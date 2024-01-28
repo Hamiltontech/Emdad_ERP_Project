@@ -1,4 +1,4 @@
-from emdad import model, api, fields
+from emdad import models, fields, api
 
 class EmdadSalesOrder(models.Model):
     _name = "emdad.sales"
