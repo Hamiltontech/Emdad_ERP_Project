@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_emdad_hr,Emdad HR Access,model_emdad_hr,base.group_user,1,1,1,0
+access_emdad_hr_department,Emdad HR Department Access,model_emdad_hr_department,base.group_user,1,1,1,0
+access_emdad_hr_education,Emdad HR Education Access,model_emdad_hr_education,base.group_user,1,1,1,0
+access_emdad_hr_education_major,Emdad HR Education Major Access,model_emdad_hr_education_major,base.group_user,1,1,1,0
+access_emdad_hr_education_school,Emdad HR Education School Access,model_emdad_hr_education_school,base.group_user,1,1,1,0
+access_emdad_hr_work_history,Emdad HR Work History Access,model_emdad_hr_work_history,base.group_user,1,1,1,0
+access_emdad_hr_position,Emdad HR Position Access,model_emdad_hr_position,base.group_user,1,1,1,0
+access_emdad_hr_contract,Emdad HR Contract Access,model_emdad_hr_contract,base.group_user,1,1,1,0
+access_emdad_hr_salary,Emdad HR Salary Access,model_emdad_hr_salary,base.group_user,1,1,1,0
+access_emdad_hr_work,Emdad HR Work Access,model_emdad_hr_work,base.group_user,1,1,1,0
+access_emdad_hr_bank,Emdad HR Bank Access,model_emdad_hr_bank,base.group_user,1,1,1,0
+access_emdad_hr_user,Emdad HR User Access,model_emdad_hr_user,base.group_user,1,1,1,0

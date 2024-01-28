@@ -19,7 +19,7 @@ class ProductManagement(models.Model):
     fav_product = fields.Boolean(string="Fav. Product")
     product_origin = fields.Many2one("res.country", string="Origin")
     name_ar = fields.Char(string="Product Name العربية")
-    
+    # quants = fields.Many2many("emdad.warehouse.quants.lines", "product_id", string="Quants")
     @api.onchange('products_pricing')
     def _calculate_average(self):
         for record in self:
