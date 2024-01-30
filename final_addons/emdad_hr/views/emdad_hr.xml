@@ -232,6 +232,34 @@
         </form>
     </field>
 </record>
+<record id="emdad_hr_attendance_view_form" model="ir.ui.view">
+    <field name="name">emdad_hr_attendance.view.form</field>
+    <field name="model">emdad.hr.attendance</field>
+    <field name="arch" type="xml">
+        <form string="">
+            <sheet>
+            <button string="Log Checkin" type="object" class="oe_highlight" name="record_checkin"/>
+            <button string="Log Checkout" type="object" class="oe_highlight" name="record_checkout"/>
+
+                <group>
+                    <field name="name"/>
+                    <field name="related_employee"/>
+                    <field name="related_contract"/>
+                    <field name="checkin"/>
+                    <field name="checkout"/>
+                    <field name="working_hours" widget="float_time"/>
+                    <field name="extra"/>
+                    <field name="checkin_location"/>
+                    <field name="checkout_location"/>
+                    <field name="is_late"/>
+                    <field name="is_checkin"/>
+                    <fiel dname="day"/>
+
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
 <!--kanban-->
 <record id="emdad_hr_view_kanban" model="ir.ui.view">
     <field name="name">emdad_hr.view.kanban</field>
@@ -279,6 +307,12 @@
         <field name="view_mode">kanban,form</field>
         <field name="domain">[]</field>
     </record>
+     <record model="ir.actions.act_window" id="emdad_hr_attendance_windows">
+        <field name="name">Attendance Management</field>
+        <field name="res_model">emdad.hr.attendance</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
 
     
 <!--MEnu-->
@@ -290,6 +324,12 @@
         id="emdad_hr_profile_menu"
         name="Human Resources"
         action="emdad_hr_windows"
+        parent="emdad_hr_menu"
+        sequence="10"/>
+        <menuitem
+        id="emdad_hr_attendance_menu"
+        name="Attendance"
+        action="emdad_hr_attendance_windows"
         parent="emdad_hr_menu"
         sequence="10"/>
         <menuitem
