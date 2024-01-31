@@ -2,6 +2,7 @@ from emdad import fields, api, models
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 from emdad.exceptions import ValidationError
+from geopy.geocoders import Nominatim  # Import the geopy library
 
 class EmdadHR(models.Model):
     _name="emdad.hr"
@@ -300,3 +301,57 @@ class EmdadJobPositions(models.Model):
     description = fields.Html(string="Job Description")
     files = fields.Binary(string="Attachements")
     department = fields.Many2one("emdad.hr.department", string="Related Department")
+
+class EmdadAttendance(models.Model):
+    _name="emdad.hr.attendance"
+
+    name = fields.Char(string="Attendance Refernce")
+    related_employee = fields.Many2one("emdad.hr", string="Employee")
+    related_contract = fields.Many2one("emdad.hr.contract", related="related_employee.active_contract")
+    checkin = fields.Datetime(string="Check In")
+    checkout = fields.Datetime(string="Check Out")
+    working_hours = fields.Float(string="Working Hours", compute="_compute_working_hours", store=True)
+    extra = fields.Float(string="Extra Hours")
+    checkin_location = fields.Char(string="Checkin Location")
+    checkout_location = fields.Char(string="Checkout Location")
+    is_checkin = fields.Boolean(string="Checkedin")
+    is_checkout = fields.Boolean(string="Checkedout")
+    is_late = fields.Boolean(string="Late")
+    day = fields.Selection([
+            ('1', 'Sunday'), ('2', 'Monday'), ('3', 'Tuesday'),
+            ('4', 'Wednesday'), ('5', 'Thursday'), ('6', 'Friday'), ('7', 'Saturday')
+        ], default=lambda self: str((datetime.now().weekday() + 1) % 7 + 1))
+    
+    def record_checkin(self):
+        for record in self:
+            location = self._get_current_location()
+            if record.related_employee:
+                record.checkin = datetime.now()
+                record.is_checkin = True
+                record.checkin_location = location
+                record.checkin = datetime.now()
+            
+    def record_checkout(self):
+        for record in self:
+            if record.checkin and record.related_employee:
+                record.checkout = datetime.now()
+                record.is_checkout = True
+    
+    @api.depends('checkin', 'checkout')
+    def _compute_working_hours(self):
+        for record in self:
+            if record.checkin and record.checkout:
+                delta = record.checkout - record.checkin
+                record.working_hours = delta.total_seconds() / 3600
+            else:
+                record.working_hours = 0.0
+    
+    def _get_current_location(self):
+        geolocator = Nominatim(user_agent="your_app_name")  # Replace with your app name
+        try:
+            location = geolocator.geocode("Your city, country")  # Replace with the desired city and country
+            if location:
+                return f"{location.latitude},{location.longitude}"
+        except Exception as e:
+            # Handle exceptions (e.g., geocoding service unavailable)
+            return False

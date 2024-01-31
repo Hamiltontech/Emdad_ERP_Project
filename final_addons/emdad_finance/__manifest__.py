@@ -1,18 +1,18 @@
 {
-    'name': 'Emdad Sales System',
+    'name': 'Emdad Finance System',
     'version': '1.0',
-    'description': '',
+    'description': 'This is the accounting system for Emdad',
     'summary': '',
     'author': '',
     'website': '',
     'license': 'LGPL-3',
     'category': '',
     'depends': [
-        'base', 'emdad_inventory','emdad_contacts'
+        'base'
     ],
     'data': [
-        'views/sales_order_view.xml',
-        'security/ir.model.access.csv'
+        'views/chart_of_account_view.xml',
+        'security/ir.model.access.csv',
     ],
     'demo': [
         ''
