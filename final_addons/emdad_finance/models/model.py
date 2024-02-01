@@ -190,7 +190,7 @@ class EmdadInvoiceLines(models.Model):
     name = fields.Char(string="Line ID")
     related_invoice = fields.Many2one("emdad.invoice", string="Related Invoice")
     product_id = fields.Many2one("product.management", string="Product")
-    income_account = fields.Many2one("emdad.accounts", related="product_id.category.income_account")
+    income_account = fields.Many2one("emdad.accounts")
     quantity = fields.Float(string="Quantity")
     unit_price = fields.Float(string="Unit Price")
     discount = fields.Float(string="Discount %")

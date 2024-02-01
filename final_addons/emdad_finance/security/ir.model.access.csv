@@ -1,8 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_emdad_accounts,Emdad Accounts Access,model_emdad_accounts,base.group_internal_user,1,1,1,0
-access_emdad_accounts_type,Emdad Accounts Type Access,model_emdad_accounts_type,base.group_internal_user,1,1,1,0
-access_emdad_accounts_journal,Emdad Accounts Journal Access,model_emdad_accounts_journal,base.group_internal_user,1,1,1,0
-access_emdad_journal_entry,Emdad Journal Entry Access,model_emdad_journal_entry,base.group_internal_user,1,1,1,0
-access_emdad_journal_line,Emdad Journal Line Access,model_emdad_journal_line,base.group_internal_user,1,1,1,0
-access_emdad_invoice,Emdad Invoice Access,model_emdad_invoice,base.group_internal_user,1,1,1,0
-access_emdad_invoice_lines,Emdad Invoice Lines Access,model_emdad_invoice_lines,base.group_internal_user,1,1,1,0
+access_emdad_accounts,emdad.accounts.access,model_emdad_accounts,base.group_user,1,1,1,0
+access_emdad_accounts_type,emdad.accounts.type.access,model_emdad_accounts_type,base.group_user,1,1,1,0
+access_emdad_accounts_journal,emdad.accounts.journal.access,model_emdad_accounts_journal,base.group_user,1,1,1,0
+access_emdad_journal_entry,emdad.journal.entry.access,model_emdad_journal_entry,base.group_user,1,1,1,0
+access_emdad_journal_line,emdad.journal.line.access,model_emdad_journal_line,base.group_user,1,1,1,0
+access_emdad_invoice,emdad.invoice.access,model_emdad_invoice,base.group_user,1,1,1,0
+access_emdad_invoice_lines,emdad.invoice.lines.access,model_emdad_invoice_lines,base.group_user,1,1,1,0
