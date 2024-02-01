@@ -18,14 +18,14 @@
             <field name="account" widget="badge"/>
             Contact Name
             <h1>
-                <field name="name"/>
+                <field name="name" required="1"/>
             </h1>
             </div>
                 <group string="Contact Information">
                     <group>
-                        <field name="contact_type"/>
-                        <field name="phone" widget="phone"/>
-                        <field name="email" widget="email"/>
+                        <field name="contact_type" required="1" />
+                        <field name="phone" widget="phone" required="1" />
+                        <field name="email" widget="email" required="1" />
                         <field name="website" widget="url"/>
                     </group>
                     <group>
@@ -63,11 +63,14 @@
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_global_click">
-                        <h4>
-                        <field name="name"/>
-                        </h4>
-                        <hr></hr>
-                        <field name="contact_type" widget="badge"/>
+                            <div class="oe_kanban_card" style="text-align: center;">
+                                <h4><span style="color:#909090;">Name: </span><field name="name"/></h4>
+                                <h4><span style="color:#909090;">phone: </span><field name="phone"/></h4>
+                                <h4><span style="color:#909090;">email: </span><field name="email"/></h4>
+                                <hr></hr>
+                                <field name="contact_type" widget="badge"/>
+                                <field name="account" widget="badge"/>
+                            </div>
                         </div>
                     </t>
                 </templates>

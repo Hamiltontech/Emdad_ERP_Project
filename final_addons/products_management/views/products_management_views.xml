@@ -9,13 +9,13 @@
             <div class="oe_title">
             <strong>Product Name</strong>
                 <h1>
-                    <field name="name"/>
+                    <field name="name" required="1"/>
                 </h1>
             </div>
             <group name="product_detals" string="Product Information">
                 <group name="product_fixed_info" string="Products Reference">
                     <field name="name_ar"/>
-                    <field name="barcode"/>
+                    <field name="barcode" required="1"/>
                     <field name="emdad_reference"/>
                     <field name="selling_price"/>
                     <field name="is_expiary"/>

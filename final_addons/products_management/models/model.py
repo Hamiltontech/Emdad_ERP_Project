@@ -4,8 +4,8 @@ from datetime import datetime, date
 
 class ProductManagement(models.Model):
     _name = 'product.management'
-    name = fields.Char(string="Product Name")
-    barcode = fields.Char(string="Barcode", unique=True)
+    name = fields.Char(string="Product Name",required=True)
+    barcode = fields.Char(string="Barcode", unique=True ,required=True)
     emdad_reference = fields.Char("Emdad ID", unque=True)
     description = fields.Text("Description")
     category = fields.Many2one("product.emdad.category", string="Product Category")

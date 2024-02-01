@@ -2,7 +2,7 @@
 <emdad>
 <!-- form     -->
 <record id="emdad_hr_view_form" model="ir.ui.view">
-    <field name="name">emdad_hr.view.form</field>
+    <field name="name" >emdad_hr.view.form</field>
     <field name="model">emdad.hr</field>
     <field name="arch" type="xml">
         <form string="">
@@ -14,7 +14,7 @@
             <field name="status" widget="badge"/>
             <div class="oe_title">
             <h1>
-                <field name="name"/>
+                <field name="name" required="1"/>
             </h1>
             </div>
                 <group string="Definitions">
@@ -30,8 +30,8 @@
                 </group>
                 <group name="basic" string="Basic Information">
                     <group string="Communication">
-                        <field name="phone" widget="phone"/>
-                        <field name="personal_email" widget="email"/>
+                        <field name="phone" widget="phone" required="1"/>
+                        <field name="personal_email" widget="email" required="1"/>
                         <field name="emdad_user" widget="selection_create" context="{'default_login' : personal_email, 'default_name' : name, 'default_mobile': phone}"/>
                     </group>
                     <group string="Address">
