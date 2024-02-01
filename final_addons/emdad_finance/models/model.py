@@ -175,3 +175,38 @@ class EmdadJELine(models.Model):
     debit = fields.Float(string="Debit")
     date = fields.Date(string="Date")
     partner = fields.Many2one("emdad.contacts", string="Partner")
+
+class EmdadInvoice(models.Model):
+    _name="emdad.invoice"
+
+    name = fields.Char(string="Invoice ID")
+    date = fields.Date(string="Issue Date")
+    accounting_date = fields.Date(string="Accounting Date")
+    invoice_lines = fields.One2many("emdad.invoice.lines", "related_invoice", string="Invoice Lines")
+
+class EmdadInvoiceLines(models.Model):
+    _name="emdad.invoice.lines"
+
+    name = fields.Char(string="Line ID")
+    related_invoice = fields.Many2one("emdad.invoice", string="Related Invoice")
+    product_id = fields.Many2one("product.management", string="Product")
+    income_account = fields.Many2one("emdad.accounts", related="product_id.category.income_account")
+    quantity = fields.Float(string="Quantity")
+    unit_price = fields.Float(string="Unit Price")
+    discount = fields.Float(string="Discount %")
+    total = fields.Float(string="Total", readonly=True)
+    final_total = fields.Float(string="Total", compute="_get_final_total")
+
+    @api.depends('quantity', 'unit_price', 'discount')
+    def _get_final_total(self):
+        for record in self:
+            if record.discount and record.quantity and record.unit_price:
+                total_amount = record.quantity * record.unit_price
+                discount_amount = (record.discount / 100) * total
+                record.final_total = total_amount - discount_amount
+            elif record.discount and record.quantity and record.unit_price:  # Add the missing colon here
+                record.total = record.quantity * record.unit_price
+                record.final_total = record.total
+            else:
+                record.total = 0
+                record.final_total = 0
