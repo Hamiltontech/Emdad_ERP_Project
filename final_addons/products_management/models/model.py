@@ -19,6 +19,8 @@ class ProductManagement(models.Model):
     fav_product = fields.Boolean(string="Fav. Product")
     product_origin = fields.Many2one("res.country", string="Origin")
     name_ar = fields.Char(string="Product Name العربية")
+    is_kit = fields.Boolean(string="Is a kit")
+    # contains = fields.Many2many("product.management", string="Components")
     quants = fields.Float(compute='get_total_counted_qty')
 
     @api.onchange('products_pricing')

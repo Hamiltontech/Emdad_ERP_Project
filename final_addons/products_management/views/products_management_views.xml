@@ -19,6 +19,7 @@
                     <field name="emdad_reference"/>
                     <field name="selling_price"/>
                     <field name="is_expiary"/>
+                    <field name="is_kit"/>
                     <field name="category"/>
                     <field name="active_product"/>
                     <field name="product_origin"/>
@@ -46,6 +47,9 @@
                         </tree>
                     </field>
                 </page>
+                <!-- <page name="contains" string="Components" invisible="'is_kit' != True">
+                <field name="contains"/>
+                </page> -->
             </notebook>
                     
                     </sheet>
@@ -130,6 +134,7 @@
                 <field name="products_metrics"/>
                     
                 </group>
+              
             </group>
                     <group name="name" string="Procurement History">
                         <!-- <field name="procurement_line"/> -->

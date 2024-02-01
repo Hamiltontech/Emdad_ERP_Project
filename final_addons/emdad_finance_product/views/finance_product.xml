@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<emdad>
+   <record id="product_emdad_category_inherit_module_name" model="ir.ui.view">
+    <field name="name">product.emdad.category.view.form.inherit</field>
+    <field name="model">product.emdad.category</field>
+    <field name="inherit_id" ref="products_management.view_category_management_form"/>
+    <field name="arch" type="xml">
+         <xpath expr="//field[@name='products_metrics']" position="after">
+                <field name="expense_account"/>
+                <field name="income_account"/>
+            </xpath>
+    </field>
+   </record>
+</emdad>
