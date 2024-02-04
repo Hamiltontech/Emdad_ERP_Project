@@ -3,7 +3,7 @@ from emdad import api, fields, models
 class EmdadSales(models.Model):
     _name="emdad.sales"
     #customer information added by laith
-    name = fields.Char(string="Sales ID")
+    name = fields.Char(string="Sales ID", compute="_get_name")
     date = fields.Date(string="Date Assigned")
     effective_date = fields.Date(string="Assigned Date")
     customer = fields.Many2one("emdad.contacts")
@@ -29,6 +29,19 @@ class EmdadSales(models.Model):
     def cancel_sales(self):
         for record in self:
             record.so_status = 'cancelled'
+
+    @api.depends('date','so_status')
+    def _get_name(self):
+        for record in self:
+            if record.customer and record.date and record.so_status:
+                so_status =str(record.so_status)
+                year = str(record.date.year)
+                month = str(record.date.month).zfill(2)
+                sequence = str(record.id).zfill(5)
+                record.name = "sales" + '/' + so_status.upper() + '/' + year + '/' + month + '/' + sequence
+            else:
+                record.name="Draft Entry"
+                
 class EmdadSalesLines(models.Model):
     _name="emdad.sales.line"
 

@@ -3,23 +3,26 @@ from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 from emdad.exceptions import ValidationError
 from geopy.geocoders import Nominatim  # Import the geopy library
+import re
+from emdad.exceptions import ValidationError
 
 class EmdadHR(models.Model):
     _name="emdad.hr"
+    _description = "HR----test"
 
-    name = fields.Char(string="Employee Name")
+    name = fields.Char(string="Employee Name",required=True)
     emp_id = fields.Integer(string="Employee ID")
     emdad_id = fields.Integer(string="Emdad ID")
     emdad_user = fields.Many2one("res.users", related="active_contract.emdad_user",string="Related User")
     related_company = fields.Many2one("res.company", related="active_contract.related_company", string="Related Company")
     #basic Information
     image = fields.Binary(string="Image")
-    phone = fields.Char(string="Phone Number", Unique=True)
+    phone = fields.Char(string="Phone Number", Unique=True,required=True)
     building = fields.Char(string="Building")
     street = fields.Char(string="Street Name")
     city = fields.Many2one("res.country.state", string="City")
     country = fields.Many2one("res.country", string="Country")
-    personal_email = fields.Char(string="Personal Email")
+    personal_email = fields.Char(string="Personal Email",required=True)
     #personal information
     dob = fields.Date(string="Date of Birth")
     age = fields.Integer(string="Age", compute="_get_age")
@@ -99,6 +102,19 @@ class EmdadHR(models.Model):
             else:
                 record.age = 0
 
+    @api.model
+    def create(self, vals):
+        if vals.get('personal_email'):
+            match = re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', vals.get('personal_email'))
+            if match == None:
+                raise ValidationError('Not a valid E-mail ID')
+
+        if vals.get('phone'):
+            match = re.match('\\+{0,1}[0-9]{10,12}', vals.get('phone'))
+            if match == None:
+                raise ValidationError('Invalid Phone Number')
+        return super(EmdadHR, self).create(vals)
+
 
 
 class EmdadHRDepartment(models.Model):
@@ -165,7 +181,7 @@ class EmdadHRWorkHistory(models.Model):
 class EmdadHRContracts(models.Model):
     _name = "emdad.hr.contract"
 
-    name = fields.Char(string="Contract ID")
+    name = fields.Char(string="Contract ID", compute="_get_name")
     start_date = fields.Date(string="Start Date")
     end_date = fields.Date(string="End Date")
     related_employee = fields.Many2one("emdad.hr", string="Related Employee")
@@ -213,6 +229,19 @@ class EmdadHRContracts(models.Model):
                     record.status = 'active'
             else:
                 record.status = 'not'
+
+    @api.depends('job','start_date','status')
+    def _get_name(self):
+        for record in self:
+            if record.related_employee and record.job and record.start_date:
+                related_employee = str(record.related_employee.name)
+                job =str(record.job.name)
+                year = str(record.start_date.year)
+                month = str(record.start_date.month).zfill(2)
+                sequence = str(record.id).zfill(5)
+                record.name = related_employee + '/' + job.upper() + '/' + year + '/' + month + '/' + sequence
+            else:
+                record.name="Draft Entry"
 
 class EmdadUserRules(models.Model):
     _name="emdad.hr.user"

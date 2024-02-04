@@ -6,6 +6,9 @@ import functools
 import logging
 import os
 import re
+import random
+import datetime
+from twilio.rest import Client
 
 from emdad import _, api, fields, models
 from emdad.addons.base.models.res_users import check_identity
@@ -24,15 +27,22 @@ class Users(models.Model):
     totp_secret = fields.Char(copy=False, groups=fields.NO_ACCESS, compute='_compute_totp_secret', inverse='_inverse_token')
     totp_enabled = fields.Boolean(string="Two-factor authentication", compute='_compute_totp_enabled', search='_totp_enable_search')
     totp_trusted_device_ids = fields.One2many('auth_totp.device', 'user_id', string="Trusted Devices")
+    assigned_otp = fields.Integer()
+    otp_last_generated_time = fields.Datetime(string='Last Generated Time')
+    phone_number = fields.Char(default='+962795017656')
+
 
     def init(self):
         super().init()
         if not sql.column_exists(self.env.cr, self._table, "totp_secret"):
             self.env.cr.execute("ALTER TABLE res_users ADD COLUMN totp_secret varchar")
 
+        if not sql.column_exists(self.env.cr, self._table, "otp_last_generated_time"):
+            self.env.cr.execute("ALTER TABLE res_users ADD COLUMN otp_last_generated_time Datetime")
+
     @property
     def SELF_READABLE_FIELDS(self):
-        return super().SELF_READABLE_FIELDS + ['totp_enabled', 'totp_trusted_device_ids']
+        return super().SELF_READABLE_FIELDS + ['totp_enabled', 'totp_trusted_device_ids', 'assigned_otp','otp_last_generated_time']
 
     def _mfa_type(self):
         r = super()._mfa_type()
@@ -69,7 +79,7 @@ class Users(models.Model):
     @api.depends('totp_secret')
     def _compute_totp_enabled(self):
         for r, v in zip(self, self.sudo()):
-            r.totp_enabled = bool(v.totp_secret)
+            r.totp_enabled = True
 
     def _rpc_api_keys_only(self):
         # 2FA enabled means we can't allow password-based RPC
@@ -81,8 +91,11 @@ class Users(models.Model):
 
     def _totp_check(self, code):
         sudo = self.sudo()
-        key = base64.b32decode(sudo.totp_secret)
-        match = TOTP(key).match(code)
+        key = sudo.assigned_otp
+        match = None
+        print("===============",key,"/////",code)
+        if key == code:
+            match = True
         if match is None:
             _logger.info("2FA check: FAIL for %s %r", self, sudo.login)
             raise AccessDenied(_("Verification failed, please double-check the 6-digit code"))
@@ -192,3 +205,32 @@ class Users(models.Model):
             self.env.cr.execute("SELECT id FROM res_users WHERE totp_secret IS NULL OR totp_secret='false'")
         result = self.env.cr.fetchall()
         return [('id', 'in', [x[0] for x in result])]
+
+    def generate_otp(self):
+        sudo = self.sudo()
+        current_time = datetime.datetime.now()
+
+        if not sudo.otp_last_generated_time or (current_time - sudo.otp_last_generated_time).total_seconds() >= 300:
+            otp_value = int(random.randint(100000, 999999))
+            print(otp_value)
+            sudo.write({'assigned_otp': otp_value, 'otp_last_generated_time': current_time})
+
+        else:
+            print(sudo.otp_last_generated_time)
+            print(sudo.assigned_otp)
+        print("--------",f'Your Emdad OTP code is {sudo.assigned_otp}',"-------"f'user phone number {sudo.phone_number}')
+
+    def send_otp_sms(self):
+        sudo = self.sudo()
+        account_sid = 'AC7f8f523885e4938a73936ce0f5b498d8'
+        auth_token = '24896cfac2d822cefab9ce8cdd5b8c80'
+        client = Client(account_sid, auth_token)
+
+        message = client.messages.create(
+        from_='+18582603816',
+        body=f'Your Emdad OTP code is {sudo.assigned_otp}',
+        to= sudo.phone_number
+        )
+
+        print(message.sid)
+        print("--------",f'Your Emdad OTP code is {sudo.assigned_otp}',"-------"f'user phone number {sudo.phone_number}')

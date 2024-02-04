@@ -145,17 +145,21 @@ class EmdadJE(models.Model):
             else:
                 record.name="Draft Entry"
 
-    # @api.onchange('total_credit','total_debit')
-    # def warning_not_balanced(self):
-    #     for record in self:
-    #         if record.total_debit and record.credit:
-    #             if record.debit != record.credit:
-    #                 raise ValidationError("Debit & Credit not balanced")
-    #             else:
-    #                 pass
-    #         else:
-    #             record.total_debit = 0
-    #             record.total_credit = 0
+    @api.model
+    def create(self,vals):
+        # print("***********",vals)
+        total_debit = 0
+        total_credit = 0
+        # print("//////////////////",vals.get("journal_lines", []))
+        for line in vals.get("journal_lines", []):
+            # print(line)
+            total_debit += line[2].get("debit", 0)
+            total_credit += line[2].get("credit", 0)
+        if total_debit != total_credit:
+            # print("--------------",total_debit,total_credit)
+            raise ValidationError('Debit & Credit not balanced')
+
+        return super(EmdadJE, self).create(vals)
     @api.depends('journal_lines.debit')
     def _get_debit(self):
         for record in self:

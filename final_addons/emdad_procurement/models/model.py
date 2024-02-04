@@ -5,7 +5,7 @@ from emdad.exceptions import ValidationError
 class EmdadProcurement(models.Model):
     _name = "emdad.procurement"
 
-    name = fields.Char(string="Procurement ID")
+    name = fields.Char(string="Procurement ID",compute="_get_name")
     effective_date = fields.Date(string="Effective Date")
     operation_type = fields.Selection([('resupply', 'Resupply'), ('replinish', 'Replinishement')], string="Procurement Type")
     vendor = fields.Many2one("emdad.contacts", string="Vendor")
@@ -142,6 +142,18 @@ class EmdadProcurement(models.Model):
         for record in self:
             if record.exp_quote and record.exp_quote <= date.today():
                 record.status = 'expired'
+
+    @api.depends('effective_date','status')
+    def _get_name(self):
+        for record in self:
+            if record.effective_date and record.status:
+                status =str(record.status)
+                year = str(record.effective_date.year)
+                month = str(record.effective_date.month).zfill(2)
+                sequence = str(record.id).zfill(5)
+                record.name = status.upper() + '/' + year + '/' + month + '/' + sequence
+            else:
+                record.name="Draft Entry"
 
 class EmdadProcurementLines(models.Model):
     _name = "emdad.line.procurement"
