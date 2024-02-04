@@ -30,16 +30,15 @@ class EmdadSales(models.Model):
         for record in self:
             record.so_status = 'cancelled'
 
-    @api.depends('customer','date','so_status')
+    @api.depends('date','so_status')
     def _get_name(self):
         for record in self:
             if record.customer and record.date and record.so_status:
-                customer = str(record.customer.name)
                 so_status =str(record.so_status)
                 year = str(record.date.year)
                 month = str(record.date.month).zfill(2)
                 sequence = str(record.id).zfill(5)
-                record.name = customer + '/' + so_status.upper() + '/' + year + '/' + month + '/' + sequence
+                record.name = "sales" + '/' + so_status.upper() + '/' + year + '/' + month + '/' + sequence
             else:
                 record.name="Draft Entry"
                 
