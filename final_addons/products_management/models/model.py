@@ -20,6 +20,9 @@ class ProductManagement(models.Model):
     product_origin = fields.Many2one("res.country", string="Origin")
     name_ar = fields.Char(string="Product Name العربية")
     is_kit = fields.Boolean(string="Is a kit")
+    purchase_metric = fields.Many2one("product.units", string="Purchase Metric")
+    selling_metric = fields.Many2one("product.units", string="Selling Metric")
+    related_metric = fields.Many2one("product.metrics", related="category.products_metrics", string="Assigned Metric")
     # contains = fields.Many2many("product.management", string="Components")
     quants = fields.Float(compute='get_total_counted_qty')
 

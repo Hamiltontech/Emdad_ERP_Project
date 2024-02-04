@@ -13,7 +13,7 @@
     'data': [
         'views/chart_of_account_view.xml',
         'security/ir.model.access.csv',
-        # 'views/invoice_view.xml'
+        'views/invoice_view.xml'
     ],
     'demo': [
         ''

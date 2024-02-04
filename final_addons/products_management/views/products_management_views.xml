@@ -27,6 +27,9 @@
                 <group name="other_information" string="Product Relations">
                 <field name="product_image"/>
                 <field name="description"/>
+                <field name="selling_metric" domain="[('metric', '=', related_metric)]"/>
+                <field name="purchase_metric" domain="[('metric', '=', related_metric)]"/>
+                <field name="related_metric"/>
                 <field name="related_company" widget="many2many_tags"/>                    
                 </group>
                 
