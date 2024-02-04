@@ -29,7 +29,30 @@ class EmdadProcurement(models.Model):
     bill_status = fields.Selection([('created','Bill Created'), ('not','Bill Not Created')])
     amount_pay = fields.Float(string="Amount To Pay")
     payment_date = fields.Date(string="Payment Date")
-    
+    payment_journal = fields.Many2one("emdad.accounts.journal", string="Pay From")
+    payment_status = fields.Selection([('not','Not Paid'),('paid','Paid')], string="Payment Status", default="not")
+    def create_payment(self):
+        payment = self.env['emdad.journal.entry']
+        for record in self:
+            data_to_copy = {
+                'date' : record.payment_date,
+                'journal' : record.payment_journal.id,
+                'type' : 'out_payment',
+                'journal_lines' : [
+                    (0, 0, {
+                        'account' : record.payment_journal.bank.id,
+                        'debit' : record.amount_pay,
+                        'partner' : record.vendor.id,
+                    }),
+                    (0, 0, {
+                        'account' : record.payment_journal.expense.id,
+                        'credit' : record.amount_pay,
+                        'partner' : record.vendor.id,
+                    })
+                ]
+            }
+            payment_created = payment.create(data_to_copy)
+            record.payment_status = 'paid'
     def create_bill_je(self):
         for record in self:
             journal_lines = []

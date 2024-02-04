@@ -12,6 +12,7 @@
             <button string="Recieve" type="object" name="recieved_process" invisible = "in_recieve == True"/>
             <button string="Create Quantities" type="object" name="create_inventory_input" invisible = " status != 'recieve'"/>
             <button string="Create Bill" type="object" name="create_bill_je" invisible="bill_status == 'created'"/>
+            <button string="Create Payment" type="object" name="create_payment" invisible="payment_status == 'paid'"/>
             <field name="status" widget="statusbar" statusbar_visible="pending,active,closed,expired,recieve" />
         </header>
             <sheet>
@@ -41,12 +42,17 @@
                  <group>
                 <field name="vendor" domain="[('contact_type', '=', 'vendor')]" invisible = "process_type != 'direct'"/>
                 <field name="vendor_phone" widget="phone" invisible = "process_type != 'direct'"/>
+                <field name="amount_pay" invisible="payment_status == 'paid'"/>
+                <field name="payment_date" invisible="payment_status == 'paid'"/>
+                <field name="payment_journal" invisible="payment_status == 'paid'"/>
+                <img src="https://www.recruitmentrevolution.com/assets/Paid-Sign.png" invisble="payment_status != 'paid'" width="150px"/>
                 </group>
                 <group string="Request Finances">
                 <group>
                     <field name="total_before_discount"/>
                     <field name="total_discount"/>
                     <field name="total_amount"/>
+                    <field name="payment_status" invisible="1"/>
                 </group>
                     
                 </group>
