@@ -5,8 +5,8 @@ class EmdadSales(models.Model):
     _name="emdad.sales"
     #customer information added by laith
     name = fields.Char(string="Sales ID", compute="_get_name")
-    date = fields.Date(string="Date Assigned")
-    effective_date = fields.Date(string="Assigned Date")
+    date = fields.Date(string="Date Assigned",required=True)
+    effective_date = fields.Date(string="Assigned Date",required=True)
     customer = fields.Many2one("emdad.contacts")
     phone = fields.Char(string="Phone", related="customer.phone")
     email = fields.Char(string="Email", related="customer.email")
