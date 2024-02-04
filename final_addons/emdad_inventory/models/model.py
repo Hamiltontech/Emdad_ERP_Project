@@ -48,7 +48,7 @@ class EmdadQuants(models.Model):
 
     name = fields.Char(string="Adjustement Reference")
     adjustment_date = fields.Date(string="Date of Adjustment")
-    purpose = fields.Selection([('correction', 'Correction'), ('normal', 'Normal Adjustement'), ('purchase','Purchase')], string="Adjustment Purpose")
+    purpose = fields.Selection([('correction', 'Correction'), ('normal', 'Normal Adjustement'), ('purchase','Purchase'), ('delivery','Delivery')], string="Adjustment Purpose")
     location = fields.Many2one("emdad.warehouse.location", string="Adjustment Location")
     quants_lines = fields.One2many("emdad.warehouse.quants.lines", "related_adjustement", string="Lines")
 

@@ -29,7 +29,7 @@ class EmdadProcurement(models.Model):
     bill_status = fields.Selection([('created','Bill Created'), ('not','Bill Not Created')])
     amount_pay = fields.Float(string="Amount To Pay")
     payment_date = fields.Date(string="Payment Date")
-
+    
     def create_bill_je(self):
         for record in self:
             journal_lines = []

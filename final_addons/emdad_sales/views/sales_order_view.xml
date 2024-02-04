@@ -8,6 +8,7 @@
             <header>
             <button type="object" name="approve_sales" string="Approve" invisible="so_status == 'approved'"/>
             <button type="object" name="cancel_sales" string="Cancel" invisible="so_status == 'cancelled'"/>
+            <button type="object" name="create_delivery" string="Create Delivery"/>
             <field name="so_status" widget="statusbar" statusbar_visible="new,approved,cancelled,in_delivery,delivered"/>
             </header>
             <sheet>
@@ -47,13 +48,21 @@
                         <field name="product"/>
                         <field name="barcode"/>
                         <field name="location" readonly="delivery_type == 'single'"/>
+                        <field name="batch" domain="[('product_id', '=', product)]"/>
                         <field name="price"/>
-                        <field name="metric"/>
+                        <field name="metric_unit" domain="[('metric', '=', metric)]"/>
+                        <field name="metric" />
                         <field name="qty"/>
+                        <field name="recieved_qty" readonly="in_delivery != True"/>
+                        <field name="sent_status" readonly="in_delivery != True"/>
                         <field name="discount"/>
+                        <field name="tax"/>
                         <field name="total"/>
                         <field name="final_total"/>
-                        <field name="delivery_type" invisible="1"/>
+                        <field name="tax_amount"/>
+                        <field name="after_tax"/>
+                        <field name="delivery_type" optional="hidden"/>
+                        <field name="in_delivery"/>
                     </tree>
                 </field>
                 <field name="total"/>

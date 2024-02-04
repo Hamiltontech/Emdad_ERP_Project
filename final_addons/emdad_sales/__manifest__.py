@@ -8,7 +8,7 @@
     'license': 'LGPL-3',
     'category': '',
     'depends': [
-        'base', 'emdad_inventory','emdad_contacts'
+        'base', 'emdad_inventory','emdad_contacts', 'emdad_finance_product'
     ],
     'data': [
         'views/sales_order_view.xml',
