@@ -24,11 +24,11 @@ Emdad ERP System consists of the following modules:
 
 ## Features
 
-Customization: The system allows for customization of modules and workflows to suit the specific needs of the organization.
-Integration: Emdad ERP System integrates seamlessly with other software systems and external services through APIs.
-Reporting: Provides comprehensive reporting capabilities with customizable reports and analytics dashboards.
-Security: Implements robust security measures to protect sensitive data and ensure compliance with regulations.
-Scalability: Designed to scale with the organization's growth and accommodate increasing data and user loads.
+- Customization: The system allows for customization of modules and workflows to suit the specific needs of the organization.
+- Integration: Emdad ERP System integrates seamlessly with other software systems and external services through APIs.
+- Reporting: Provides comprehensive reporting capabilities with customizable reports and analytics dashboards.
+- Security: Implements robust security measures to protect sensitive data and ensure compliance with regulations.
+- Scalability: Designed to scale with the organization's growth and accommodate increasing data and user loads.
 
 ## System architecture
 Emdad ERP System follows the Model-View-Controller (MVC) architecture, which is a software design pattern that divides the application into three interconnected components:
