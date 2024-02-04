@@ -123,11 +123,13 @@ class EmdadJE(models.Model):
     je_status = fields.Selection([('draft','Draft'), ('approved','Approved'),('cancelled','Cancelled')], string="Status", default="draft")
     reference = fields.Char(String="Reference")
     date = fields.Date(string="Date")
+    related_entry = fields.Char(string="Related Entry")
     journal = fields.Many2one("emdad.accounts.journal", string="Journal")
     type = fields.Selection([('invoice','Invoice'), ('bill','Bill'),('refund','Refund'), ('credit','Credit'),('out_payment','Vendor Payment'),('in_payment','Customer Payment')], string="Transaction Type")
     journal_lines = fields.One2many("emdad.journal.line", "related_je", string="Journal Lines")
     total_debit = fields.Float(string="Total Debit", compute="_get_debit")
     total_credit = fields.Float(string="Total Credit", compute="_get_credit")
+    payment_status = fields.Selection([('paid','Paid'), ('not','Not Paid'), ('partial','Partially Paid')])
  
 
     @api.depends('journal','type','date','je_status')
@@ -176,37 +178,55 @@ class EmdadJELine(models.Model):
     date = fields.Date(string="Date")
     partner = fields.Many2one("emdad.contacts", string="Partner")
 
-class EmdadInvoice(models.Model):
-    _name="emdad.invoice"
+class TaxationSystem(models.Model):
+    _name="emdad.tax"
 
-    name = fields.Char(string="Invoice ID")
-    date = fields.Date(string="Issue Date")
-    accounting_date = fields.Date(string="Accounting Date")
-    invoice_lines = fields.One2many("emdad.invoice.lines", "related_invoice", string="Invoice Lines")
+    name = fields.Char(string="Tax Name", compute="_generate_name")
+    scope = fields.Selection([('sales','Sales'), ('purchases','Purchases'),('service','Service')], string="Tax Scope")
+    percentage = fields.Float(string="Tax %")
+    tax_account = fields.Many2one("emdad.accounts", string="Related Tax Account")
 
-class EmdadInvoiceLines(models.Model):
-    _name="emdad.invoice.lines"
-
-    name = fields.Char(string="Line ID")
-    related_invoice = fields.Many2one("emdad.invoice", string="Related Invoice")
-    product_id = fields.Many2one("product.management", string="Product")
-    income_account = fields.Many2one("emdad.accounts", related="product_id.category.income_account")
-    quantity = fields.Float(string="Quantity")
-    unit_price = fields.Float(string="Unit Price")
-    discount = fields.Float(string="Discount %")
-    total = fields.Float(string="Total", readonly=True)
-    final_total = fields.Float(string="Total", compute="_get_final_total")
-
-    @api.depends('quantity', 'unit_price', 'discount')
-    def _get_final_total(self):
+    @api.onchange('scope', 'percentage')
+    def _generate_name(self):
         for record in self:
-            if record.discount and record.quantity and record.unit_price:
-                total_amount = record.quantity * record.unit_price
-                discount_amount = (record.discount / 100) * total
-                record.final_total = total_amount - discount_amount
-            elif record.discount and record.quantity and record.unit_price:  # Add the missing colon here
-                record.total = record.quantity * record.unit_price
-                record.final_total = record.total
+            if record.scope and record.percentage:
+                scope = str(record.scope)
+                percentage = str(record.percentage)
+
+                record.name = percentage + '%' + ' ' + scope.upper()
             else:
-                record.total = 0
-                record.final_total = 0
+                record.name = "Not Configured Yet"
+# class EmdadInvoice(models.Model):
+#     _name="emdad.invoice"
+
+#     name = fields.Char(string="Invoice ID")
+#     date = fields.Date(string="Issue Date")
+#     accounting_date = fields.Date(string="Accounting Date")
+#     invoice_lines = fields.One2many("emdad.invoice.lines", "related_invoice", string="Invoice Lines")
+
+# class EmdadInvoiceLines(models.Model):
+#     _name="emdad.invoice.lines"
+
+#     name = fields.Char(string="Line ID")
+#     related_invoice = fields.Many2one("emdad.invoice", string="Related Invoice")
+#     product_id = fields.Many2one("product.management", string="Product")
+#     income_account = fields.Many2one("emdad.accounts", related="product_id.category.income_account")
+#     quantity = fields.Float(string="Quantity")
+#     unit_price = fields.Float(string="Unit Price")
+#     discount = fields.Float(string="Discount %")
+#     total = fields.Float(string="Total", readonly=True)
+#     final_total = fields.Float(string="Total", compute="_get_final_total")
+
+#     @api.depends('quantity', 'unit_price', 'discount')
+#     def _get_final_total(self):
+#         for record in self:
+#             if record.discount and record.quantity and record.unit_price:
+#                 total_amount = record.quantity * record.unit_price
+#                 discount_amount = (record.discount / 100) * total
+#                 record.final_total = total_amount - discount_amount
+#             elif record.discount and record.quantity and record.unit_price:  # Add the missing colon here
+#                 record.total = record.quantity * record.unit_price
+#                 record.final_total = record.total
+#             else:
+#                 record.total = 0
+#                 record.final_total = 0

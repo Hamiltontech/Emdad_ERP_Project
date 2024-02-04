@@ -8,10 +8,12 @@
     'license': 'LGPL-3',
     'category': '',
     'depends': [
-        'base', 'emdad_finance'
+        'base', 'emdad_finance','emdad_inventory'
     ],
     'data': [
         'views/finance_product.xml',
+        'views/warehouse_finance.xml'
+        # 'security/ir.model.access.csv',
     ],
     # 'demo': [
     #     ''

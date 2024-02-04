@@ -6,9 +6,22 @@
     <field name="inherit_id" ref="products_management.view_category_management_form"/>
     <field name="arch" type="xml">
          <xpath expr="//field[@name='products_metrics']" position="after">
+                <field name="expense_journal"/>
+                <field name="invoice_journal"/>
                 <field name="expense_account"/>
                 <field name="income_account"/>
             </xpath>
+    </field>
+   </record>
+   <record id="product_management_inherit_module_name" model="ir.ui.view">
+    <field name="name">product.management.tax.view.form.inherit</field>
+    <field name="model">product.management</field>
+    <field name="inherit_id" ref="products_management.view_products_management_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='related_company']" position="before">
+            <field name="sales_tax" domain="[('scope', '=', 'sales')]"/>
+            <field name="purchase_tax" domain="[('scope', '=', 'purchases')]"/>
+        </xpath>
     </field>
    </record>
 </emdad>

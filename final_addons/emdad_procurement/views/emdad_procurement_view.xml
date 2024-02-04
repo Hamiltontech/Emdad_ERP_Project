@@ -11,6 +11,7 @@
             <button string="Close Order" type="object" name="close_quote" invisible = "status != 'active'"/>
             <button string="Recieve" type="object" name="recieved_process" invisible = "in_recieve == True"/>
             <button string="Create Quantities" type="object" name="create_inventory_input" invisible = " status != 'recieve'"/>
+            <button string="Create Bill" type="object" name="create_bill_je" invisible="bill_status == 'created'"/>
             <field name="status" widget="statusbar" statusbar_visible="pending,active,closed,expired,recieve" />
         </header>
             <sheet>
@@ -34,6 +35,8 @@
                 <field name="is_multiple" invisible="1"/>
                 <field name="all_info" invisible="1"/>
                 <field name="in_recieve"/>
+                <field name="related_bill" readonly="1"/>
+                <field name="bill_status" widget="badge"/>
                 </group>
                  <group>
                 <field name="vendor" domain="[('contact_type', '=', 'vendor')]" invisible = "process_type != 'direct'"/>
@@ -51,6 +54,7 @@
                             <tree editable="bottom">
                                 <field name="barcode"/>
                                 <field name="product_id"/>
+                                <field name="expense_account"/>
                                 <field name="attach"/>
                                 <field name="packaging"/>
                                 <field name="request_qty"/>
@@ -58,15 +62,19 @@
                                 <field name="recieved_qty" invisible = "in_recieve != True"/>
                                 <field name="difference" invisible = "in_recieve != True"/>
                                  <field name="recieve_status" widget="badge" invisible = "in_recieve != True"/>
-                                <field name="metric"/>
+                                <field name="metric" domain="[('metric', '=', related_metric)]"/>
                                 <field name="product_cost"/>
+                                <field name="tax_amount"/>
                                 <field name="discount"/>
                                 <field name="in_recieve" optional="hide"/>
                                 <field name="total"/>
                                 <field name="final_total"/>
+                                <field name="taxes"/>
+                                <field name="after_tax"/>
                                 <field name="location" invisible = "is_multiple != True"/>
                                 <field name="vendor" optional="hide"/>
                                 <field name="is_multiple" optional="hide"/>
+                                <field name="related_metric" optional="hide"/>
                             </tree>
                         </field>                </group>
             </sheet>
