@@ -18,6 +18,14 @@ class EmdadSales(models.Model):
     order_lines = fields.One2many("emdad.sales.line","related_sales", string="Order Lines")
     so_status = fields.Selection([('new','New'), ('approved','Approved'), ('cancelled','Cancelled'), ('in_delivery','In Delivery'),('delivered','Delivered')], string="Status", default="new")
 
+    @api.onchange('delivery_type', 'location')
+    def assign_the_location(self):
+        for record in self:
+            if record.delivery_type == 'single' and record.location:
+                for line in record.order_lines:
+                    line.location = record.location
+            else:
+                pass
     @api.depends('order_lines.final_total')
     def _get_total_lines(self):
         for record in self:
@@ -38,7 +46,7 @@ class EmdadSales(models.Model):
                 year = str(record.date.year)
                 month = str(record.date.month).zfill(2)
                 sequence = str(record.id).zfill(5)
-                record.name = "sales" + '/' + so_status.upper() + '/' + year + '/' + month + '/' + sequence
+                record.name = "SALES" + '/' + so_status.upper() + '/' + year + '/' + month + '/' + sequence
             else:
                 record.name="Draft Entry"
                 
@@ -46,6 +54,7 @@ class EmdadSalesLines(models.Model):
     _name="emdad.sales.line"
 
     name = fields.Char(string="ID Line")
+    delivery_type = fields.Selection([('multiple', 'Multiple Locations'), ('single','Single Location')], related="related_sales.delivery_type" ,string="Delivery Type")
     related_sales = fields.Many2one("emdad.sales", string="Related SO")
     delivery_type = fields.Selection([('multiple', 'Multiple Locations'), ('single','Single Location')], related="related_sales.delivery_type", string="Delivery Type")
     product = fields.Many2one("product.management", string="Product")
@@ -57,7 +66,7 @@ class EmdadSalesLines(models.Model):
     discount = fields.Float(string="Discount %")
     total = fields.Float(string="Total", compute="_calc_total")
     final_total = fields.Float(string="Total", compute="_get_discount")
-
+    
     @api.depends('price', 'qty', 'final_total')
     def _calc_total(self):
         for record in self:

@@ -46,13 +46,14 @@
                     <tree editable="bottom">
                         <field name="product"/>
                         <field name="barcode"/>
-                        <field name="location"/>
+                        <field name="location" readonly="delivery_type == 'single'"/>
                         <field name="price"/>
                         <field name="metric"/>
                         <field name="qty"/>
                         <field name="discount"/>
                         <field name="total"/>
                         <field name="final_total"/>
+                        <field name="delivery_type" invisible="1"/>
                     </tree>
                 </field>
                 <field name="total"/>
