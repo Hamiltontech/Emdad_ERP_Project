@@ -12,15 +12,15 @@ Technologies Used
 
 Emdad ERP System consists of the following modules:
 
-Products Management System: Manages the lifecycle of products, including creation, modification, and deletion.
-Contacts: Manages contact information for customers, suppliers, and other relevant entities.
-Finance System: Handles financial transactions, accounting, and reporting within the organization.
-Finance for Products: Manages financial aspects related to products, such as pricing, invoicing, and payments.
-Fleet System: Tracks and manages the organization's fleet of vehicles, including maintenance schedules and usage.
-Human Resources: Manages employee-related information, including payroll, attendance, and performance evaluations.
-Inventory: Tracks and manages inventory levels, stock movements, and replenishment processes.
-Procurement: Handles the procurement process, including supplier management, purchase orders, and procurement analytics.
-Sales System: Manages the sales process, including lead management, quotations, sales orders, and invoicing.
+- Products Management System: Manages the lifecycle of products, including creation, modification, and deletion.
+- Contacts: Manages contact information for customers, suppliers, and other relevant entities.
+- Finance System: Handles financial transactions, accounting, and reporting within the organization.
+- Finance for Products: Manages financial aspects related to products, such as pricing, invoicing, and payments.
+- Fleet System: Tracks and manages the organization's fleet of vehicles, including maintenance schedules and usage.
+- Human Resources: Manages employee-related information, including payroll, attendance, and performance evaluations.
+- Inventory: Tracks and manages inventory levels, stock movements, and replenishment processes.
+- Procurement: Handles the procurement process, including supplier management, purchase orders, and procurement analytics.
+- Sales System: Manages the sales process, including lead management, quotations, sales orders, and invoicing.
 
 ## Features
 
