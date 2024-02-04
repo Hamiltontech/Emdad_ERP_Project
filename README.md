@@ -61,4 +61,4 @@ Incorporate this explanation into your documentation to provide a comprehensive 
 # Maintenance and Support
 
 Updates and Maintenance: Procedures for applying updates, patches, and maintenance tasks to ensure the system's stability and security.
-Support: Information about available support channels, such as documentation, community forums, and technical support services.
+Support: Information about available support channels, such as documentation, and technical support services.
