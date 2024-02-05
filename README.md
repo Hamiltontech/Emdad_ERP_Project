@@ -58,7 +58,63 @@ Incorporate this explanation into your documentation to provide a comprehensive 
 
 ![](debian/source/emdad_allmodels.png)
 
-# Maintenance and Support
+## Maintenance and Support
 
 Updates and Maintenance: Procedures for applying updates, patches, and maintenance tasks to ensure the system's stability and security.
 Support: Information about available support channels, such as documentation, and technical support services.
+
+## System Requirements
+  1. ubuntu ubuntu 22.02 LTS
+  2. python 3.10 or higher
+  3. PostgreSQL (supported versions: 12.0 or above).
+  4. npm 16 or higher
+  5. NGINX
+     
+## Installation 
+ 1. Update System Packages
+```
+sudo apt update
+sudo apt upgrade
+```
+
+2. Clone the repository emdad repo should be installed on the home directory 
+```
+git clone https://github.com/Hamiltontech/Emdad-ERP-System.git
+```
+3. make sure you have python3 installed
+```
+python3 --version
+```
+4. make sure you have pip3 installed
+```
+pip3 --version
+```
+5. install postgresql
+```
+sudo apt install postgresql postgresql-client
+```
+6. install emdad dependency
+```
+ cd /Emdad-ERP-System
+
+ sed -n -e '/^Depends:/,/^Pre/ s/ python3-\(.*\),/python3-\1/p' debian/control | sudo xargs apt-get install -y
+``` 
+7. install npm
+```
+sudo apt install npm
+```
+8. Install rtlcss
+```
+sudo npm install -g rtlcss
+```
+Finally to run emdad 
+```
+ cd /Emdad-ERP-System
+
+ python3 emdad-bin --addons-path=final_addons
+```
+**Note**:
+once you done the instalinon and run, emdad will be running on port 8069
+- Port 8069 will be reqierd for NGINX to port 80
+- Allow all contions in the firewall
+- you may port the domain to the server through dns via the a-record 
