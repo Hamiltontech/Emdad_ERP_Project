@@ -27,8 +27,8 @@ class EmdadContacts(models.Model):
     cr_copy = fields.Binary(string="CR Copy")
     account = fields.Selection([('verified','Verified'), ('not','Not Verified')], string="Status", default="not")
     selling_transactions = fields.Integer(compute='_compute_total_selling_transactions',string="Total selling transactions")
-    procurement_transactions = fields.Integer(compute='_compute_total_procurement_transactions',string="Total procurement transactions")    category = fields.Many2one("emdad.product.category", string="Category")
-
+    procurement_transactions = fields.Integer(compute='_compute_total_procurement_transactions',string="Total procurement transactions")    selling_transactions = fields.Integer(compute='_compute_total_selling_transactions',string="Total selling transactions")
+    procurement_transactions = fields.Integer(compute='_compute_total_procurement_transactions',string="Total procurement transactions")
     @api.onchange('cr_number')
     def on_change_cr_number(self):
         if self.cr_number:
