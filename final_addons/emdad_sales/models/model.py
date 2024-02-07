@@ -19,7 +19,7 @@ class EmdadSales(models.Model):
     order_lines = fields.One2many("emdad.sales.line","related_sales", string="Order Lines")
     so_status = fields.Selection([('new','New'), ('approved','Approved'), ('cancelled','Cancelled'), ('in_delivery','In Delivery'),('delivered','Delivered')], string="Status", default="new")
     in_delivery = fields.Boolean(string="In Delivery")
-
+    stages = fields.Char(compute="_get_stage", default="RFP")
     def create_delivery(self):
         quants = self.env['emdad.warehouse.quants']
         for record in self:
@@ -68,6 +68,18 @@ class EmdadSales(models.Model):
                 record.name = "SALES" + '/' + so_status.upper() + '/' + year + '/' + month + '/' + sequence
             else:
                 record.name="Draft Entry"
+    
+    @api.onchange('so_status')
+    def _get_stage(self):
+        for record in self:
+            if record.so_status == "new" or record.so_status == "cancelled":
+                record.stages = "RFP"
+
+            elif record.so_status == "approved":
+                record.stages = "sales order"
+
+            else:
+                record.stages = "sales order"
                 
 class EmdadSalesLines(models.Model):
     _name="emdad.sales.line"

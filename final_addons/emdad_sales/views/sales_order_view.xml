@@ -14,6 +14,7 @@
             <sheet>
             <div class="oe_title">
             <h1>
+                <span style='float: right; font-size:2rem;'><field name="stages"/></span>
                 <field name="name"/>
             </h1>
             </div>
@@ -44,7 +45,7 @@
                     </group>
                 </group>
                 <field name="order_lines" widget="one2many_list" context="{'default_location': location}">
-                    <tree editable="bottom">
+                    <tree>
                         <field name="product"/>
                         <field name="barcode"/>
                         <field name="location" readonly="delivery_type == 'single'"/>

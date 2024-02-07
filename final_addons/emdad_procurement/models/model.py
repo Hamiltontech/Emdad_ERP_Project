@@ -181,6 +181,25 @@ class EmdadProcurement(models.Model):
             else:
                 record.name="Draft Entry"
 
+    @api.onchange('status','bill_status')
+    def _get_stage(self):
+        for record in self:
+            if record.status == "pending":
+                record.stages = "RFQ"
+
+            elif record.status == "active" and record.bill_status == "not":
+                record.stages = "PO"
+
+            elif record.bill_status == "created" and record.status == "active":
+                record.stages = "Billed"
+            
+            elif record.bill_status == "created" and record.status == "recieved":
+                record.stages = "receipt"
+            else:
+                record.stages = "PO"
+
+
+
 class EmdadProcurementLines(models.Model):
     _name = "emdad.line.procurement"
 
