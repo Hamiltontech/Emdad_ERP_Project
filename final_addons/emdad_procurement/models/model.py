@@ -26,11 +26,14 @@ class EmdadProcurement(models.Model):
     in_recieve = fields.Boolean(string="In Recieving")
     recieved = fields.Boolean(string="Recieved")
     related_bill = fields.Many2one("emdad.journal.entry", string="Related Bill")
-    bill_status = fields.Selection([('created','Bill Created'), ('not','Bill Not Created')])
+    bill_status = fields.Selection([('created','Bill Created'), ('not','Bill Not Created')], default="not")
     amount_pay = fields.Float(string="Amount To Pay")
     payment_date = fields.Date(string="Payment Date")
     payment_journal = fields.Many2one("emdad.accounts.journal", string="Pay From")
     payment_status = fields.Selection([('not','Not Paid'),('paid','Paid')], string="Payment Status", default="not")
+    credit_facility = fields.Many2one("emdad.credit.facility", string="Credit Facility")
+    credit_value = fields.Float(string="Credit Value", related="credit_facility.amount")
+    credit_balance = fields.Float(string="Credit Balance", related="credit_facility.balance")
     def create_payment(self):
         payment = self.env['emdad.journal.entry']
         for record in self:
@@ -186,6 +189,9 @@ class EmdadProcurementLines(models.Model):
     related_partner = fields.Many2one("emdad.contacts", related="related_procurement.vendor")
     barcode = fields.Char(string="Barcode", related="product_id.barcode")
     product_id = fields.Many2one("product.management", string="Product", ondelete="cascade")
+    product_category = fields.Char(related="product_id.category.categ_fullname", string="Category")
+    product_image = fields.Binary(string="Product Image", related="product_id.product_image")
+    description = fields.Text(string="Description")
     expense_account = fields.Many2one("emdad.accounts", related="product_id.category.expense_account", string="Expense Account")
     attach = fields.Binary(string="Specifications")
     request_qty = fields.Float(string="Quantity")
@@ -207,6 +213,7 @@ class EmdadProcurementLines(models.Model):
     taxes = fields.Float(string="Taxes Amount")
     after_tax = fields.Float(string="Total Inc.")
     related_metric = fields.Many2one("product.metrics", related="product_id.related_metric", string="Related Metric")
+    proc_status = fields.Selection([('pending', 'Pending'),('active','Active'), ('closed','Closed'), ('expired','Expired'), ('recieve', 'Receiving'), ('recieved','Recieved')], string="Quote Status", default="pending", related="related_procurement.status")
 
     @api.onchange('product_id')
     def get_default_metric(self):

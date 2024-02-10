@@ -32,74 +32,240 @@
                 <field name="distribution_type"/>
                 <field name="single_location" invisible = "distribution_type != 'single'" domain="[('used_reciepts', '=', True)]"/>
                 <field name="status"/>
-                <field name="published"/>
+                <field name="published" invisible="1"/>
                 <field name="is_multiple" invisible="1"/>
                 <field name="all_info" invisible="1"/>
-                <field name="in_recieve"/>
-                <field name="related_bill" readonly="1"/>
-                <field name="bill_status" widget="badge"/>
+                <field name="in_recieve" invisible="1"/>
+                <field name="related_bill" readonly="1" invisible="bill_status == 'not'"/>
+                <field name="bill_status" widget="badge" invisible="status == 'pending'"/>
                 </group>
                  <group>
                 <field name="vendor" domain="[('contact_type', '=', 'vendor')]" invisible = "process_type != 'direct'"/>
                 <field name="vendor_phone" widget="phone" invisible = "process_type != 'direct'"/>
+                <field name="credit_facility"/>
+                <field name="credit_balance"/>
+                <field name="credit_value"/>
                 <field name="amount_pay" invisible="payment_status == 'paid'"/>
                 <field name="payment_date" invisible="payment_status == 'paid'"/>
                 <field name="payment_journal" invisible="payment_status == 'paid'"/>
-                <img src="https://www.recruitmentrevolution.com/assets/Paid-Sign.png" invisble="payment_status != 'paid'" width="150px"/>
                 </group>
-                <group string="Request Finances">
+                <group string="Request Finances" invisible="status == 'pending'">
                 <group>
-                    <field name="total_before_discount"/>
+                    <field name="total_before_discount" string="Before Discount"/>
                     <field name="total_discount"/>
                     <field name="total_amount"/>
                     <field name="payment_status" invisible="1"/>
                 </group>
                     
                 </group>
-            <field name="procurement_lines" widget="one2many_list" invisible = "all_info != True" context="{'default_vendor' : vendor, 'default_location': single_location, 'default_is_multiple': is_multiple}">
+                <notebook>
+                    <page name="product_list" string="Products">
+                         <field name="procurement_lines" widget="one2many_list" invisible = "all_info != True" context="{'default_vendor' : vendor, 'default_location': single_location, 'default_is_multiple': is_multiple}">
+                            <kanban>
+                              <t t-name="kanban-box">
+                               <div t-attf-class="oe_kanban_global_click">
+                                <t t-name="kanban-box">
+                  <div t-attf-class="oe_kanban_global_click">
+                      <div class="o_kanban_image">
+                          <img t-att-src="kanban_image('emdad.line.procurement', 'product_image', record.id.raw_value)" alt="Book"
+                              class="o_image_128_contain"/>
+                      </div>
+                      <div class="oe_kanban_details">
+                          <strong class="o_kanban_record_title">
+                          <field name="product_id"/>
+                          </strong>
+                      <div>
+                             Requested Quantity: <field name="request_qty"/> <field name="metric"/>
+                             <br></br>
+                              Barcode: <field name="barcode"/>
+                              <field name="proc_status" invisible="1"/>
+                      </div>
+                      <div invisible="proc_status == 'recieve'">
+                            Recieved Quantity : <field name="recieved_qty"/> <field name="metric"/>
+                            <br></br>
+                            Difference : <field name="difference"/> <field name="metric"/>
+                            <br></br>
+                            <field name="recieve_status" widget="badge" invisible="proc_status == 'pending'"/>
+
+                      </div>
+                      <div invisible="proc_status == 'pending'">                                                
+                            Total : <field name="after_tax"/> SAR                             
+                      </div>
+                      
+                      <div>
+                      <hr></hr>
+                         <field name="description"/>
+                      </div>
+                      </div>
+                  </div>
+              </t>
+                                </div>
+                                </t>
+                            </kanban>
+                        </field>                
+                    </page>
+                    <page name="pricing" string="Pricing List" invisible="status == 'pending'">
+                        <field name="procurement_lines">
                             <tree editable="bottom">
-                                <field name="barcode"/>
+                                 <field name="barcode"/>
                                 <field name="product_id"/>
                                 <field name="expense_account"/>
-                                <field name="attach"/>
-                                <field name="packaging"/>
-                                <field name="request_qty"/>
-                                <field name="batch" invisible = "in_recieve != True" widget="many2one_new" options="{'no_open': True}"/>
-                                <field name="recieved_qty" invisible = "in_recieve != True"/>
-                                <field name="difference" invisible = "in_recieve != True"/>
-                                 <field name="recieve_status" widget="badge" invisible = "in_recieve != True"/>
-                                <field name="metric" domain="[('metric', '=', related_metric)]"/>
+                                <!-- <field name="attach"/> -->
+                                <!-- <field name="packaging"/> -->
+                                <!-- <field name="request_qty"/> -->
+                                <!-- <field name="batch" invisible = "in_recieve != True" widget="many2one_new" options="{'no_open': True}"/> -->
+                                <!-- <field name="recieved_qty" invisible = "in_recieve != True"/> -->
+                                <!-- <field name="difference" invisible = "in_recieve != True"/> -->
+                                 <!-- <field name="recieve_status" widget="badge" invisible = "in_recieve != True"/> -->
+                                <!-- <field name="metric" domain="[('metric', '=', related_metric)]"/> -->
                                 <field name="product_cost"/>
                                 <field name="tax_amount"/>
                                 <field name="discount"/>
-                                <field name="in_recieve" optional="hide"/>
+                                <!-- <field name="in_recieve" optional="hide"/> -->
                                 <field name="total"/>
                                 <field name="final_total"/>
                                 <field name="taxes"/>
                                 <field name="after_tax"/>
-                                <field name="location" invisible = "is_multiple != True"/>
+                                <!-- <field name="location" invisible = "is_multiple != True"/> -->
                                 <field name="vendor" optional="hide"/>
                                 <field name="is_multiple" optional="hide"/>
                                 <field name="related_metric" optional="hide"/>
                             </tree>
-                        </field>                </group>
+                        </field>
+                    </page>
+                    <page name="recieve" string="Recieving Information" invisible="status != 'recieve'">
+                        <field name="procurement_lines" widget="One2many_list">
+                            <tree editable="bottom">
+                                <field name="barcode"/>
+                                <field name="product_id"/>
+                                <field name="attach" widget="download_link" options="{'filename': 'attach_fname'}"/>
+                                <field name="request_qty"/>
+                                <field name="recieved_qty"/>
+                                <field name="difference"/>
+                                <field name="metric"/>
+                                <field name="recieve_status"/>
+                                <field name="is_multiple" invisible="1" optional="hide"/>
+                                <field name="location" invisible = "is_multiple != True"/>
+                            </tree>
+                        </field>
+                        
+                    </page>
+                </notebook>
+           </group>
             </sheet>
         </form>
     </field>
    </record>
+   <record id="emdad_line_procurement_view_form" model="ir.ui.view">
+    <field name="name">emdad_line_procurement.view.form</field>
+    <field name="model">emdad.line.procurement</field>
+    <field name="arch" type="xml">
+        <form string="Add a Procurement Line">
+            <sheet>
+                <group>
+                    <group string="Product Information">
+                        <field name="product_id"/>
+                        <field name="barcode"/>
+                        <field name="product_category"/>
+                        <field name="product_image" widget="image" class="oe_avatar" options='{"size": [100, 100]}'/>
+                    </group>
+                    <group string="Request Details">
+                        <field name="packaging"/>
+                        <field name="request_qty"/>
+                        <field name="metric" domain="[('metric', '=', related_metric)]"/>
+                        <field name="related_metric" optional="hide"/>
+                    </group>
+                </group>
+                <group>
+                    <group string="Logistics">
+                        <field name="location"/>
+                        <field name="recieved_qty" invisible="proc_status != 'recieve'"/>
+                        <field name="recieve_status" widget="badge" invisible="proc_status != 'recieve'"/>
+                        <field name="proc_status" invisible="1"/>
+                    </group>
+                    <group string="Branding">
+                        <field name="attach"/>
+                        <field name="description"/>
+                    </group>
+                </group>
+                <group invisible="proc_status == 'pending'">
+                    <group string="Pricing">
+                        <field name="product_cost"/>
+                        <field name="discount"/>
+                        <field name="tax_amount"/>
+                    </group>
+                    <group string="Finances">
+                        <field name="total"/>
+                        <field name="final_total"/>
+                        <field name="taxes" readonly="1"/>
+                        <field name="after_tax" readonly="1"/>
+                    </group>
+                </group>
+            </sheet>
+        </form>
+    </field>
+   </record>
+    <record id="emdad_procurement_quick_view_form" model="ir.ui.view">
+    <field name="name">emdad_procurement_quick.view.form</field>
+    <field name="model">emdad.procurement</field>
+    <field name="arch" type="xml">
+        <form string="Quick Edit Form" >
+            <group>
+                <field name="process_type" string="Source"/>
+                <field name="vendor" domain="[('contact_type', '=', 'vendor')]" invisible = "process_type != 'direct'"/>
+                <field name="operation_type" string="Operation"/>
+                <field name="exp_quote" string="Expiary"/>
+                <field name="distribution_type" string="Distribution"/>
+                <field name="single_location" invisible = "distribution_type != 'single'" domain="[('used_reciepts', '=', True)]"/>
+            </group>
+        </form>
+    </field>
+</record>
 
     <record id="emdad_procurement_view_kanban" model="ir.ui.view">
         <field name="name">emdad_procurement_kanban.view.kanban</field>
         <field name="model">emdad.procurement</field>
         <field name="arch" type="xml">
-            <kanban>
+            <kanban default_group_by="process_type"
+quick_create_view="emdad_procurement.emdad_procurement_quick_view_form"
+on_create="quick_create">
                 <templates>
                     <t t-name="kanban-box">
-                        <div class="oe_kanban_global_click" style="text-align: center;">
-                        <field name="operation_type" widget="badge"/>
-                        <hr></hr>
-                        <field name="name"/>
+                        <div t-attf-class="oe_kanban_global_click">
+                        <div class="row mb4">
+                                    <div class="col-6 o_kanban_record_headings">
+                                        <strong>
+                                            <span>
+                                                <field name="name"/>
+                                            </span>
+                                        </strong>
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <strong><field name="effective_date"/></strong>
+                                    </div>
+                                </div>
+                            <div class="oe_kanban_body">
+                                <field name="process_type" widget="badge"/>
+                                <hr></hr>
+                                Operation Type: <field name="operation_type"/>
+                                <hr></hr>
+                                Expiartion: <field name="exp_quote"/>
+                                <hr></hr>
+                                Distribution: <field name="distribution_type"/>
+                            </div>
+                            <div class="oe_kanban_footer">
+                            <div class="oe_kanban_footer_left">
+                                <field name="published" widget="toggle" invisible="1"/>
+                            </div>
+                            <hr></hr>
+                            <div class="oe_kanban_footer_right">
+                                  <button string="Publish" type="object" name="publish_quote" invisible="published == True, operation_type == 'direct'" class="oe_highlight"/>
+                            </div>
+                            </div>
+                            <div class="oe_clear"/>
+
                         </div>
+                        
                     </t>
                 </templates>
             </kanban>

@@ -200,6 +200,23 @@ class TaxationSystem(models.Model):
                 record.name = percentage + '%' + ' ' + scope.upper()
             else:
                 record.name = "Not Configured Yet"
+
+class EmdadCreditFacility(models.Model):
+    _name="emdad.credit.facility"
+
+    name = fields.Char(string="Credit Facility ID")
+    start_date = fields.Date(string="Start Date")
+    end_date = fields.Date(string="End Date")
+    status = fields.Selection([('active','Active'), ('expired','Expired')], string="LC Status")
+    vendor = fields.Many2one("emdad.contacts", string="Vendor")
+    vendor_cr = fields.Char(string="Vendor CR", related="vendor.cr_number")
+    credit_number = fields.Char(string="Credit Number")
+    credit_source = fields.Selection([('emdad','Emdad'), ('vendor','From Vendor')], string="Credit Source")
+    lc_account = fields.Many2one("emdad.accounts", string="Credit Account")
+    amount = fields.Float(string="Amount")
+    balance = fields.Float(string="Balance", related="lc_account.balance")
+    
+
 # class EmdadInvoice(models.Model):
 #     _name="emdad.invoice"
 

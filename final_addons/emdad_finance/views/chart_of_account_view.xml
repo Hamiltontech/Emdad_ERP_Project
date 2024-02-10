@@ -191,6 +191,12 @@
         </kanban>
     </field>
 </record>
+<record model="ir.actions.act_window" id="emdad_credit_facility_windows">
+        <field name="name">Company Journals</field>
+        <field name="res_model">emdad.credit.facility</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
 <record model="ir.actions.act_window" id="journal_entry_emdad_windows">
         <field name="name">Company Journals</field>
         <field name="res_model">emdad.journal.entry</field>
@@ -253,4 +259,11 @@
         action="journals_emdad_windows"
         parent="finance_settings_menu"
         sequence="1"/>
+        <menuitem
+            id="emdad_credit_facility_menu"
+            name="Credit Facility"
+            action="emdad_credit_facility_windows"
+                    parent="finance_settings_menu"
+
+            sequence="10"/>
 </emdad>
