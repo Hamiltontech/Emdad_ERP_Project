@@ -75,6 +75,8 @@ class ProductsCategories(models.Model):
     _name="product.emdad.category"
 
     name = fields.Char(string="Category Name")
+    code_base = fields.Char(string="Category Code")
+    parent_key = fields.Char(string="Parent Key")
     parent = fields.Many2one("product.emdad.category", string="Parent Category")
     category_type = fields.Selection([('internal', 'Internal Use'), ('selling', 'Selling Products'), ('consumed', 'Consumed Products')], string="Category Type")
     products_metrics = fields.Many2one("product.metrics", string="Product Metrics")
