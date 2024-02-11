@@ -34,6 +34,7 @@ class EmdadProcurement(models.Model):
     credit_facility = fields.Many2one("emdad.credit.facility", string="Credit Facility")
     credit_value = fields.Float(string="Credit Value", related="credit_facility.amount")
     credit_balance = fields.Float(string="Credit Balance", related="credit_facility.balance")
+    stages = fields.Char(compute="_get_stage", default="RFQ")
     def create_payment(self):
         payment = self.env['emdad.journal.entry']
         for record in self:
@@ -172,14 +173,32 @@ class EmdadProcurement(models.Model):
     @api.depends('effective_date','status')
     def _get_name(self):
         for record in self:
-            if record.effective_date and record.status:
-                status =str(record.status)
+            if record.effective_date:
                 year = str(record.effective_date.year)
                 month = str(record.effective_date.month).zfill(2)
                 sequence = str(record.id).zfill(5)
-                record.name = status.upper() + '/' + year + '/' + month + '/' + sequence
+                record.name = "PROCUREMENT" + '/' + year + '/' + month + '/' + sequence
             else:
                 record.name="Draft Entry"
+
+    @api.onchange('status','bill_status')
+    def _get_stage(self):
+        for record in self:
+            if record.status == "pending":
+                record.stages = "RFQ"
+
+            elif record.status == "active" and record.bill_status == "not":
+                record.stages = "PO"
+
+            elif record.bill_status == "created" and record.status == "active":
+                record.stages = "Billed"
+            
+            elif record.bill_status == "created" and record.status == "recieved":
+                record.stages = "receipt"
+            else:
+                record.stages = "PO"
+
+
 
 class EmdadProcurementLines(models.Model):
     _name = "emdad.line.procurement"

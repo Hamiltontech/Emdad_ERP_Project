@@ -7,25 +7,26 @@ class ProductManagement(models.Model):
     name = fields.Char(string="Product Name",required=True)
     barcode = fields.Char(string="Barcode", unique=True ,required=True)
     emdad_reference = fields.Char("Emdad ID", unque=True)
-    description = fields.Text("Description")
-    category = fields.Many2one("product.emdad.category", string="Product Category")
-    is_expiary = fields.Boolean(string="Has Expiary")
+    description = fields.Text("Description",required=True)
+    category = fields.Many2one("product.emdad.category", string="Product Category",required=True)
+    is_expiary = fields.Boolean(string="Has Expiary",required=True)
     product_image = fields.Binary(string="Product Image")
-    related_company = fields.Many2many("res.company")
+    related_company = fields.Many2many("res.company",required=True)
     selling_price = fields.Float(string="Average Price", store=True)
     purchase_price = fields.Float(string="Last Purchase Price")
-    products_pricing = fields.One2many("emdad.products.pricing", "related_product", string="Product Pricing")
-    active_product = fields.Boolean(string="Active Product")
+    products_pricing = fields.One2many("emdad.products.pricing", "related_product", string="Product Pricing",required=True)
+    active_product = fields.Boolean(string="Active Product",required=True)
     fav_product = fields.Boolean(string="Fav. Product")
-    product_origin = fields.Many2one("res.country", string="Origin")
-    name_ar = fields.Char(string="Product Name العربية")
-    is_kit = fields.Boolean(string="Is a kit")
-    purchase_metric = fields.Many2one("product.units", string="Purchase Metric")
-    selling_metric = fields.Many2one("product.units", string="Selling Metric")
+    product_origin = fields.Many2one("res.country", string="Origin",required=True)
+    name_ar = fields.Char(string="Product Name العربية",required=True)
+    is_kit = fields.Boolean(string="Is a kit",required=True)
+    purchase_metric = fields.Many2one("product.units", string="Purchase Metric",required=True)
+    selling_metric = fields.Many2one("product.units", string="Selling Metric",required=True)
     related_metric = fields.Many2one("product.metrics", related="category.products_metrics", string="Assigned Metric")
     # contains = fields.Many2many("product.management", string="Components")
-    quants = fields.Float(compute='get_total_counted_qty')
-
+    quants = fields.Float(compute='get_total_counted_qty',string="quantity")
+    total_sales_count = fields.Integer(compute='_compute_total_sales_count',string="Total sales count")
+    total_procurement_count = fields.Integer(compute='_compute_total_procurement_count',string="total procurement count")
     @api.onchange('products_pricing')
     def _calculate_average(self):
         for record in self:
@@ -51,6 +52,24 @@ class ProductManagement(models.Model):
             print("---------",total_count)
             print(record.id)
             record.quants = total_count
+    
+    def _compute_total_procurement_count(self):
+        for record in self:
+            procurement_records = self.env['emdad.line.procurement']
+            subquery = procurement_records.search([
+                ('product_id.id', '=', record.id)
+            ])
+            total_records = len(subquery.read())
+            record.total_procurement_count = total_records
+
+    def _compute_total_sales_count(self):
+        for record in self:
+            sales_records = self.env['emdad.sales.line']
+            subquery = sales_records.search([
+                ('product.id', '=', record.id)
+            ])
+            total_records = len(subquery.read())
+            record.total_sales_count = total_records
 
 class ProductsCategories(models.Model):
     _name="product.emdad.category"
