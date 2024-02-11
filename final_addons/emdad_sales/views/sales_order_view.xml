@@ -14,7 +14,6 @@
             <sheet>
             <div class="oe_title">
             <h1>
-                <span style='float: right; font-size:2rem;'><field name="stages"/></span>
                 <field name="name"/>
             </h1>
             </div>
@@ -30,8 +29,8 @@
                 </group>
                 <group string="Logistics Information">
                     <group>
-                        <field name="effective_date" required="1"/>
-                        <field name="date" required="1"/>
+                        <field name="effective_date"/>
+                        <field name="date"/>
                         <field name="delivery_type"/>
                         <field name="location" invisible="delivery_type != 'single'"/>
                     </group>
@@ -45,7 +44,7 @@
                     </group>
                 </group>
                 <field name="order_lines" widget="one2many_list" context="{'default_location': location}">
-                    <tree>
+                    <tree editable="bottom">
                         <field name="product"/>
                         <field name="barcode"/>
                         <field name="location" readonly="delivery_type == 'single'"/>

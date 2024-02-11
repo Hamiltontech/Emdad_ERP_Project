@@ -12,50 +12,41 @@
                     <field name="name" required="1"/>
                 </h1>
             </div>
-            <group>
-                <group>
-                <field name="total_sales_count"/>
-                </group>
-                <group>
-                <field name="total_procurement_count"/>
-                </group>
-            </group>
             <group name="product_detals" string="Product Information">
                 <group name="product_fixed_info" string="Products Reference">
-                    <field name="name_ar" required="1"/>
+                    <field name="name_ar"/>
                     <field name="barcode" required="1"/>
-                    <field name="emdad_reference" required="1"/>
-                    <field name="selling_price" required="1"/>
-                    <field name="is_expiary" required="1"/>
-                    <field name="is_kit" required="1"/>
-                    <field name="category" required="1"/>
-                    <field name="active_product" required="1"/>
-                    <field name="product_origin" required="1"/>
-                    <field name="quants"/>
+                    <field name="emdad_reference"/>
+                    <field name="selling_price"/>
+                    <field name="is_expiary"/>
+                    <field name="is_kit"/>
+                    <field name="category"/>
+                    <field name="active_product"/>
+                    <field name="product_origin"/>
                 </group>
                 <group name="other_information" string="Product Relations">
-                        <field name="product_image"/>
-                        <field name="description" required="1"/>
-                        <field name="selling_metric" domain="[('metric', '=', related_metric)]" required="1"/>
-                        <field name="purchase_metric" domain="[('metric', '=', related_metric)]" required="1"/>
-                        <field name="related_metric"/>
-                        <field name="related_company" widget="many2many_tags" required="1"/>                    
+                <field name="product_image"/>
+                <field name="description"/>
+                <field name="selling_metric" domain="[('metric', '=', related_metric)]"/>
+                <field name="purchase_metric" domain="[('metric', '=', related_metric)]"/>
+                <field name="related_metric"/>
+                <field name="related_company" widget="many2many_tags"/>                    
                 </group>
                 
             </group>
             <notebook>
                 <page name="pricing" string="Product Pricing">
-                    <field name="products_pricing" widget="one2many_list" context="{'default_related_product': id}" required="1">
+                    <field name="products_pricing" widget="one2many_list" context="{'default_related_product': id}">
                         <tree editable="bottom">
-                            <field name="related_product" optional="hidden" required="1"/>
-                            <field name="name" required="1"/>
-                            <field name="min_qty" required="1"/>
-                            <field name="max_qty" required="1"/>
-                            <field name="related_unit" required="1"/>
-                            <field name="start_date" required="1"/>
-                            <field name="end_date" required="1"/>
-                            <field name="price" required="1"/>
-                            <field name="status" widget="badge" required="1"/>
+                            <field name="related_product" optional="hidden"/>
+                            <field name="name"/>
+                            <field name="min_qty"/>
+                            <field name="max_qty"/>
+                            <field name="related_unit"/>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="price"/>
+                            <field name="status" widget="badge"/>
                         </tree>
                     </field>
                 </page>

@@ -21,14 +21,6 @@
                 <field name="name" required="1"/>
             </h1>
             </div>
-            <group>
-                <group>
-                <field name="selling_transactions" invisible="contact_type == 'employee'"/>
-                </group>
-                <group>
-                <field name="procurement_transactions" invisible="contact_type == 'employee'"/>
-                </group>
-            </group>
                 <group string="Contact Information">
                     <group>
                         <field name="contact_type" required="1" />

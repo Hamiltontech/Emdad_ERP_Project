@@ -26,8 +26,7 @@ class EmdadContacts(models.Model):
     from_wathq = fields.Boolean(string="From Wathiq")
     cr_copy = fields.Binary(string="CR Copy")
     account = fields.Selection([('verified','Verified'), ('not','Not Verified')], string="Status", default="not")
-    selling_transactions = fields.Integer(compute='_compute_total_selling_transactions',string="Total selling transactions")
-    procurement_transactions = fields.Integer(compute='_compute_total_procurement_transactions',string="Total procurement transactions")
+
     @api.onchange('cr_number')
     def on_change_cr_number(self):
         if self.cr_number:
@@ -105,24 +104,7 @@ class EmdadContacts(models.Model):
             if match == None:
                 raise ValidationError('Invalid Phone Number')
         return super(EmdadContacts, self).create(vals)
-    
-    def _compute_total_selling_transactions(self):
-        for record in self:
-            sales_records = self.env['emdad.sales']
-            subquery = sales_records.search([
-                ('customer', '=', record.id)
-            ])
-            total_records = len(subquery.read())
-            record.selling_transactions = total_records
 
-    def _compute_total_procurement_transactions(self):
-        for record in self:
-            procurement_records = self.env['emdad.procurement']
-            subquery = procurement_records.search([
-                ('vendor', '=', record.id)
-            ])
-            total_records = len(subquery.read())
-            record.procurement_transactions = total_records
 
 class EmdadCities(models.Model):
     _name = "emdad.cities"

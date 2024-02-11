@@ -19,11 +19,10 @@
             <div class="oe_title">
             Procurement ID 
             <h1>
-                <span style='float: right; font-size:2rem;'><field name="stages"/></span>
                 <field name="name"/>
             </h1>
             </div>
-            <group string="Request Information">
+                <group string="Request Information">
                 <group>
                 <field name="effective_date"/>
                 <field name="exp_quote"/>
