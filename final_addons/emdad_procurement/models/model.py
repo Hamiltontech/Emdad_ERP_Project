@@ -34,6 +34,7 @@ class EmdadProcurement(models.Model):
     credit_facility = fields.Many2one("emdad.credit.facility", string="Credit Facility")
     credit_value = fields.Float(string="Credit Value", related="credit_facility.amount")
     credit_balance = fields.Float(string="Credit Balance", related="credit_facility.balance")
+    stages = fields.Char(compute="_get_stage", default="RFQ")
     def create_payment(self):
         payment = self.env['emdad.journal.entry']
         for record in self:
