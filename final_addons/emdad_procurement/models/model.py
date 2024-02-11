@@ -172,12 +172,11 @@ class EmdadProcurement(models.Model):
     @api.depends('effective_date','status')
     def _get_name(self):
         for record in self:
-            if record.effective_date and record.status:
-                status =str(record.status)
+            if record.effective_date:
                 year = str(record.effective_date.year)
                 month = str(record.effective_date.month).zfill(2)
                 sequence = str(record.id).zfill(5)
-                record.name = status.upper() + '/' + year + '/' + month + '/' + sequence
+                record.name = "PROCUREMENT" + '/' + year + '/' + month + '/' + sequence
             else:
                 record.name="Draft Entry"
 
