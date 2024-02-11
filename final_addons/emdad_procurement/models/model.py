@@ -5,7 +5,7 @@ from emdad.exceptions import ValidationError
 class EmdadProcurement(models.Model):
     _name = "emdad.procurement"
 
-    name = fields.Char(string="Procurement ID")
+    name = fields.Char(string="Procurement ID",compute="_get_name")
     effective_date = fields.Date(string="Effective Date")
     operation_type = fields.Selection([('resupply', 'Resupply'), ('replinish', 'Replinishement')], string="Procurement Type")
     vendor = fields.Many2one("emdad.contacts", string="Vendor")
@@ -25,6 +25,74 @@ class EmdadProcurement(models.Model):
     all_info = fields.Boolean(string="All Information", compute="_check_all_info")
     in_recieve = fields.Boolean(string="In Recieving")
     recieved = fields.Boolean(string="Recieved")
+    related_bill = fields.Many2one("emdad.journal.entry", string="Related Bill")
+    bill_status = fields.Selection([('created','Bill Created'), ('not','Bill Not Created')], default="not")
+    amount_pay = fields.Float(string="Amount To Pay")
+    payment_date = fields.Date(string="Payment Date")
+    payment_journal = fields.Many2one("emdad.accounts.journal", string="Pay From")
+    payment_status = fields.Selection([('not','Not Paid'),('paid','Paid')], string="Payment Status", default="not")
+    credit_facility = fields.Many2one("emdad.credit.facility", string="Credit Facility")
+    credit_value = fields.Float(string="Credit Value", related="credit_facility.amount")
+    credit_balance = fields.Float(string="Credit Balance", related="credit_facility.balance")
+    def create_payment(self):
+        payment = self.env['emdad.journal.entry']
+        for record in self:
+            data_to_copy = {
+                'date' : record.payment_date,
+                'journal' : record.payment_journal.id,
+                'type' : 'out_payment',
+                'journal_lines' : [
+                    (0, 0, {
+                        'account' : record.payment_journal.bank.id,
+                        'debit' : record.amount_pay,
+                        'partner' : record.vendor.id,
+                    }),
+                    (0, 0, {
+                        'account' : record.payment_journal.expense.id,
+                        'credit' : record.amount_pay,
+                        'partner' : record.vendor.id,
+                    })
+                ]
+            }
+            payment_created = payment.create(data_to_copy)
+            record.payment_status = 'paid'
+    def create_bill_je(self):
+        for record in self:
+            journal_lines = []
+
+            for line in record.procurement_lines:
+                line_data = [
+                    (0, 0, {
+                        'account': line.expense_account.id,
+                        'credit': line.after_tax,
+                        'partner': line.vendor.id
+                    }),
+                    (0, 0, {
+                        'account': line.tax_amount.tax_account.id,
+                        'name': 'Tax for' + ' ' + line.related_procurement.name,
+                        'debit': line.taxes,
+                        'partner': line.vendor.id
+                    }),
+                    (0, 0, {
+                        'account': line.location.related_warehouse.inventory_account.id,
+                        'name': 'Buying '+ line.product_id.name + ' ' + line.related_procurement.name,
+                        'debit': line.after_tax - line.taxes,
+                        'partner': line.vendor.id
+                    })              
+                ]
+                journal_lines.extend(line_data)
+
+            journal_entry = self.env['emdad.journal.entry'].create({
+                'date': record.effective_date,
+                'related_entry': record.name,
+                'type': 'bill',
+                'journal_lines': journal_lines,
+            })
+
+            record.ensure_one()
+            record.write({'related_bill': journal_entry.id})
+            record.bill_status = 'created'
+
 
     @api.depends('in_receive', 'procurement_lines', 'name')
     def create_inventory_input(self):
@@ -76,7 +144,7 @@ class EmdadProcurement(models.Model):
     def _onchange_procurement_lines(self):
         total_before_discount = sum(self.procurement_lines.mapped('total'))
         total_discount = sum(self.procurement_lines.mapped('final_total'))
-        total_amount = total_before_discount - total_discount
+        total_amount = sum(self.procurement_lines.mapped('after_tax'))
 
         self.total_before_discount = total_before_discount
         self.total_discount = total_discount
@@ -101,16 +169,34 @@ class EmdadProcurement(models.Model):
             if record.exp_quote and record.exp_quote <= date.today():
                 record.status = 'expired'
 
+    @api.depends('effective_date','status')
+    def _get_name(self):
+        for record in self:
+            if record.effective_date and record.status:
+                status =str(record.status)
+                year = str(record.effective_date.year)
+                month = str(record.effective_date.month).zfill(2)
+                sequence = str(record.id).zfill(5)
+                record.name = status.upper() + '/' + year + '/' + month + '/' + sequence
+            else:
+                record.name="Draft Entry"
+
 class EmdadProcurementLines(models.Model):
     _name = "emdad.line.procurement"
 
     name = fields.Char(string="Procuement Reference ID")
     related_procurement = fields.Many2one("emdad.procurement", string="Related Order", ondelete="cascade", index=True)
+    related_partner = fields.Many2one("emdad.contacts", related="related_procurement.vendor")
     barcode = fields.Char(string="Barcode", related="product_id.barcode")
     product_id = fields.Many2one("product.management", string="Product", ondelete="cascade")
+    product_category = fields.Char(related="product_id.category.categ_fullname", string="Category")
+    product_image = fields.Binary(string="Product Image", related="product_id.product_image")
+    description = fields.Text(string="Description")
+    expense_account = fields.Many2one("emdad.accounts", related="product_id.category.expense_account", string="Expense Account")
     attach = fields.Binary(string="Specifications")
     request_qty = fields.Float(string="Quantity")
     product_cost = fields.Float(string="Cost")
+    tax_amount = fields.Many2one("emdad.tax", string="Tax")
     total = fields.Float(string="Total", compute="_total_cost")
     final_total = fields.Float(string="Final Total", compute="_calculate_discount")
     discount = fields.Float(string="Discount %")
@@ -124,7 +210,35 @@ class EmdadProcurementLines(models.Model):
     difference = fields.Float(string="Difference", compute="_compute_difference")
     recieve_status = fields.Selection([('full', 'Recieved All'), ('partial', 'Partial'), ('not', 'Not Received')], string="Status", compute="_get_status")
     batch = fields.Many2one("emdad.warehouse.batches", string="Related Batch")
+    taxes = fields.Float(string="Taxes Amount")
+    after_tax = fields.Float(string="Total Inc.")
+    related_metric = fields.Many2one("product.metrics", related="product_id.related_metric", string="Related Metric")
+    proc_status = fields.Selection([('pending', 'Pending'),('active','Active'), ('closed','Closed'), ('expired','Expired'), ('recieve', 'Receiving'), ('recieved','Recieved')], string="Quote Status", default="pending", related="related_procurement.status")
 
+    @api.onchange('product_id')
+    def get_default_metric(self):
+        for record in self:
+            if not record.metric:
+                record.metric = record.product_id.purchase_metric
+            else:
+                pass
+    @api.onchange('product_id')
+    def get_the_tax(self):
+        for record in self:
+            if record.product_id:
+                record.tax_amount = record.product_id.purchase_tax
+            else:
+                pass
+    @api.onchange('product_cost', 'final_total', 'tax_amount', 'after_tax', 'taxes')
+    def calculate_tax(self):
+        for record in self: 
+            if record.tax_amount:
+                tax_percentage = record.tax_amount.percentage
+                taxes = record.final_total * (tax_percentage / 100)
+                record.taxes = taxes
+                record.after_tax = record.final_total + taxes
+            else:
+                record.after_tax = record.final_total
     @api.depends('recieved_qty', 'request_qty')
     def _get_status(self):
         for record in self:

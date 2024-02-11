@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<emdad>
+    <record id="emdad_tax_view_form" model="ir.ui.view">
+        <field name="name">emdad_tax.view.form</field>
+        <field name="model">emdad.tax</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group string="Invoice Information">
+                        <group>
+                            <field name="scope"/>
+                            <field name="percentage"/>
+                            <field name="tax_account"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record model="ir.actions.act_window" id="emdad_tax_windows">
+        <field name="name">Taxation</field>
+        <field name="res_model">emdad.tax</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
+    <menuitem
+        id="emdad_tax_menu"
+        name="Taxation"
+        action="emdad_tax_windows"
+        parent="finance_settings_menu"
+        sequence="10"/>
+</emdad>

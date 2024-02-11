@@ -48,7 +48,7 @@ class EmdadQuants(models.Model):
 
     name = fields.Char(string="Adjustement Reference")
     adjustment_date = fields.Date(string="Date of Adjustment")
-    purpose = fields.Selection([('correction', 'Correction'), ('normal', 'Normal Adjustement'), ('purchase','Purchase')], string="Adjustment Purpose")
+    purpose = fields.Selection([('correction', 'Correction'), ('normal', 'Normal Adjustement'), ('purchase','Purchase'), ('delivery','Delivery')], string="Adjustment Purpose")
     location = fields.Many2one("emdad.warehouse.location", string="Adjustment Location")
     quants_lines = fields.One2many("emdad.warehouse.quants.lines", "related_adjustement", string="Lines")
 
@@ -109,6 +109,13 @@ class EmdadQuantsLines(models.Model):
     related_adjustement = fields.Many2one("emdad.warehouse.quants", string="Related Adjustement")
     scrap_action = fields.Many2one("emdad.warehouse.scrap", string="Related Scrap")
 
+    @api.onchange('product_id', 'metric')
+    def assign_default_metric(self):
+        for record in self:
+            if not record.metric:
+                record.metric = record.product_id.selling_metric
+        else:
+            pass
     @api.depends('cost', 'counted_qty')
     def _calculate_unit_cost(self):
         for record in self:

@@ -1,13 +1,15 @@
 from emdad import api, fields, models
 from twilio.rest import Client
 import requests
+import re
+from emdad.exceptions import ValidationError
 
 class EmdadContacts(models.Model):
     _name="emdad.contacts"
 
-    name = fields.Char(string="Contact Name")
-    contact_type = fields.Selection([('vendor','Vendor'), ('customer','Customer'), ('employee','Employee')], string="Contact Type")
-    phone = fields.Char(string="Phone")
+    name = fields.Char(string="Contact Name", required=True)
+    contact_type = fields.Selection([('vendor','Vendor'), ('customer','Customer'), ('employee','Employee')], string="Contact Type",required=True)
+    phone = fields.Char(string="Phone",required=True)
     email = fields.Char(string="Official Email")
     website = fields.Char(string="Website")
     cr_number = fields.Char(string="CR Number", unique="True")
@@ -89,6 +91,19 @@ class EmdadContacts(models.Model):
             )
 
         return True
+    
+    @api.model
+    def create(self, vals):
+        if vals.get('email'):
+            match = re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', vals.get('email'))
+            if match == None:
+                raise ValidationError('Not a valid E-mail ID')
+
+        if vals.get('phone'):
+            match = re.match('\\+{0,1}[0-9]{10,12}', vals.get('phone'))
+            if match == None:
+                raise ValidationError('Invalid Phone Number')
+        return super(EmdadContacts, self).create(vals)
 
 
 class EmdadCities(models.Model):

@@ -214,10 +214,10 @@
             <field name="model">ir.model</field>
             <field name="arch" type="xml">
                 <tree string="Model Description">
-                    <field name="model"/>
+                    <!-- <field name="model"/> -->
                     <field name="name"/>
-                    <field name="state"/>
-                    <field name="transient"/>
+                    <!-- <field name="state"/>
+                    <field name="transient"/> -->
                 </tree>
             </field>
         </record>

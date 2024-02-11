@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<emdad>
+<record id="emdad_sales_view_form" model="ir.ui.view">
+    <field name="name">emdad_sales.view.form</field>
+    <field name="model">emdad.sales</field>
+    <field name="arch" type="xml">
+        <form string="">
+            <header>
+            <button type="object" name="approve_sales" string="Approve" invisible="so_status == 'approved'"/>
+            <button type="object" name="cancel_sales" string="Cancel" invisible="so_status == 'cancelled'"/>
+            <button type="object" name="create_delivery" string="Create Delivery"/>
+            <field name="so_status" widget="statusbar" statusbar_visible="new,approved,cancelled,in_delivery,delivered"/>
+            </header>
+            <sheet>
+            <div class="oe_title">
+            <h1>
+                <field name="name"/>
+            </h1>
+            </div>
+                <group string="Customer Information">
+                    <group>
+                        <field name="customer"/>
+                        <field name="phone"/>
+                        <field name="email"/>
+                    </group>
+                    <group>
+                        <field name="cr_number"/>
+                    </group>
+                </group>
+                <group string="Logistics Information">
+                    <group>
+                        <field name="effective_date"/>
+                        <field name="date"/>
+                        <field name="delivery_type"/>
+                        <field name="location" invisible="delivery_type != 'single'"/>
+                    </group>
+                    <group>
+                        <field name="effective_date"/>
+                        <field name="date"/>
+                        <field name="delivery_type"/>
+                        <field name="location" invisible="delivery_type != 'single'"/>
+                    </group>
+                    <group>
+                    </group>
+                </group>
+                <field name="order_lines" widget="one2many_list" context="{'default_location': location}">
+                    <tree editable="bottom">
+                        <field name="product"/>
+                        <field name="barcode"/>
+                        <field name="location" readonly="delivery_type == 'single'"/>
+                        <field name="batch" domain="[('product_id', '=', product)]"/>
+                        <field name="price"/>
+                        <field name="metric_unit" domain="[('metric', '=', metric)]"/>
+                        <field name="metric" />
+                        <field name="qty"/>
+                        <field name="recieved_qty" readonly="in_delivery != True"/>
+                        <field name="sent_status" readonly="in_delivery != True"/>
+                        <field name="discount"/>
+                        <field name="tax"/>
+                        <field name="total"/>
+                        <field name="final_total"/>
+                        <field name="tax_amount"/>
+                        <field name="after_tax"/>
+                        <field name="delivery_type" optional="hidden"/>
+                        <field name="in_delivery"/>
+                    </tree>
+                </field>
+                <field name="total"/>
+            </sheet>
+        </form>
+    </field>
+</record>
+<record model="ir.actions.act_window" id="emdad_sales_windows">
+        <field name="name">Sales Management</field>
+        <field name="res_model">emdad.sales</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
+<menuitem
+    id="emdad_sales_menu"
+    name="Sales Management"
+    sequence="10"/>
+<menuitem
+    id="emdad_sales_sub_menu"
+    name="Sales Management"
+    action="emdad_sales_windows"
+    parent="emdad_sales_menu"
+    sequence="10"/>
+    
+
+</emdad>

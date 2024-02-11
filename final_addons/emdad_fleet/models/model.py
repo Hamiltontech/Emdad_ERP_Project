@@ -13,6 +13,7 @@ class EmdadFleet(models.Model):
     status = fields.Selection([('in_progress', 'In Progress'), ('expired', 'Expired')], string="Contract Status", related="insurance_plan.status")
     container_quantity = fields.Float(string="Current Quantity", related="related_location.quantity")
     container_status = fields.Selection([('in_use','In Use'), ('not_used','Not Used')], string="Container Status", compute="_container_status")
+    related_employee = fields.Many2one("emdad.hr", string="Related Employee")
 
     @api.depends('container_quantity')
     def _container_status(self):

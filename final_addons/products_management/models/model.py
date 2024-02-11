@@ -4,8 +4,8 @@ from datetime import datetime, date
 
 class ProductManagement(models.Model):
     _name = 'product.management'
-    name = fields.Char(string="Product Name")
-    barcode = fields.Char(string="Barcode", unique=True)
+    name = fields.Char(string="Product Name",required=True)
+    barcode = fields.Char(string="Barcode", unique=True ,required=True)
     emdad_reference = fields.Char("Emdad ID", unque=True)
     description = fields.Text("Description")
     category = fields.Many2one("product.emdad.category", string="Product Category")
@@ -19,7 +19,13 @@ class ProductManagement(models.Model):
     fav_product = fields.Boolean(string="Fav. Product")
     product_origin = fields.Many2one("res.country", string="Origin")
     name_ar = fields.Char(string="Product Name العربية")
-    
+    is_kit = fields.Boolean(string="Is a kit")
+    purchase_metric = fields.Many2one("product.units", string="Purchase Metric")
+    selling_metric = fields.Many2one("product.units", string="Selling Metric")
+    related_metric = fields.Many2one("product.metrics", related="category.products_metrics", string="Assigned Metric")
+    # contains = fields.Many2many("product.management", string="Components")
+    quants = fields.Float(compute='get_total_counted_qty')
+
     @api.onchange('products_pricing')
     def _calculate_average(self):
         for record in self:
@@ -30,6 +36,21 @@ class ProductManagement(models.Model):
                 record.selling_price = total_price / lines
             else:
                 record.selling_price = 0.0
+
+    def get_total_counted_qty(self):
+        for record in self:
+            print("*****************",record.id)
+            quants_lines = self.env['emdad.warehouse.quants.lines']
+            subquery = quants_lines.search([
+                ('product_id', '=', record.id)
+            ])
+            subquery = subquery.read(['counted_qty'])
+            print(subquery)
+            
+            total_count = sum(line['counted_qty'] for line in subquery)
+            print("---------",total_count)
+            print(record.id)
+            record.quants = total_count
 
 class ProductsCategories(models.Model):
     _name="product.emdad.category"

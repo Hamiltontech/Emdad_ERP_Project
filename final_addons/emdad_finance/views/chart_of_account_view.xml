@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<emdad>
+<record id="emdad_accounts_view_form" model="ir.ui.view">
+    <field name="name">emdad_accounts.view.form</field>
+    <field name="model">emdad.accounts</field>
+    <field name="arch" type="xml">
+        <form string="">
+            <sheet>
+                <group>
+                    
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+<record id="emdad_account_type_view_form" model="ir.ui.view">
+    <field name="name">emdad_account_type.view.form</field>
+    <field name="model">emdad.accounts.type</field>
+    <field name="arch" type="xml">
+        <form string="">
+            <sheet>
+                <div class="oe_title">
+                <h1>
+                    <field name="name"/>
+                </h1>
+                </div>
+                <group string="Account Type information">
+                    <field name="code_name"/>
+                    <field name="code_type"/>
+                    <field name="description"/>
+                </group>
+                <field name="accounts" widget="one2many_list" context="{'default_account_type': id}">
+                    <tree editable="bottom">
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="parent_account"/>
+                        <field name="account_type"/>
+                        <field name="description"/>
+                    </tree>
+                </field>
+            </sheet>
+        </form>
+    </field>
+</record>
+<record id="emdad_accounts_journal_view_form" model="ir.ui.view">
+    <field name="name">emdad_accounts_journal.view.form</field>
+    <field name="model">emdad.accounts.journal</field>
+    <field name="arch" type="xml">
+        <form string="">
+            <sheet>
+            <div class="oe_title">
+                <h1>
+                    <field name="name"/>
+                </h1>
+            </div>
+                <group string="Journal Information">
+                <group>
+                    <field name="journal_type"/>
+                    <field name="journal_icon"/>
+                    <field name="income"/>
+                    <field name="expense"/>
+                    </group>
+                    <group>
+                    <field name="short_code"/>
+                <field name="cash" invisible="journal_type != 'cash'"/>
+                <field name="bank" invisible="journal_type != 'bank'"/>
+                    </group>
+                </group>
+                <field name="je" widget="one2many_list">
+                    <tree editable="bottom">
+                        <field name="name"/>
+                        <field name="date"/>
+                        <field name="type"/>
+                        <field name="total_debit"/>
+                        <field name="total_credit"/>
+                    </tree>
+                </field>
+            </sheet>
+        </form>
+    </field>
+</record>
+<record id="emdad_journal_entry_view_form" model="ir.ui.view">
+    <field name="name">emdad_journal_entry.view.form</field>
+    <field name="model">emdad.journal.entry</field>
+    <field name="arch" type="xml">
+        <form string="">
+            <sheet>
+            <div class="oe_title">
+            <h1>
+                <field name="name"/>
+            </h1>
+            </div>
+                <group string="Journal Entry Information">
+                    <group>
+                        <field name="reference"/>
+                        <field name="date"/>
+                        <field name="journal"/>
+                        <field name="je_status" widget="badge"/>
+                    </group>
+                    <group>
+                        <field name="type"/>
+                        <field name="total_debit"/>
+                        <field name="total_credit"/>
+                    </group>
+                </group>
+                <field name="journal_lines" widget="one2many_list">
+                    <tree editable="bottom">
+                        <field name="account"/>
+                        <field name="partner"/>
+                        <field name="name"/>
+                        <field name="date"/>
+                        <field name="debit"/>
+                        <field name="credit"/>
+                    </tree>
+                </field>
+            </sheet>
+        </form>
+    </field>
+</record>
+<record id="emdad_accounts_view_form" model="ir.ui.view">
+    <field name="name">emdad_accounts.view.form</field>
+    <field name="model">emdad.accounts</field>
+    <field name="arch" type="xml">
+        <form string="">
+            <sheet>
+            <div class="oe_title">
+            <h1>
+                <field name="name"/>
+            </h1>
+            </div>
+                <group string="Account Information">
+                <group>
+                    <field name="code_type"/>
+                    <field name="account"/>
+                    <field name="code"/>
+                    <field name="parent_account"/>
+                    <field name="account_type"/>
+                    <field name="description"/>
+                </group>
+                <group>
+                    <field name="total_debit" style="color: green;"/>
+                    <field name="total_credit" style="color: red;"/>
+                    <field name="balance"/>
+                </group>
+                </group>
+                <field name="je_lines" widget="one2many_list">
+                    <tree editable="bottom">
+                        <field name="account"/>
+                        <field name="date"/>
+                        <field name="partner"/>
+                        <field name="related_je"/>
+                        <field name="journal"/>
+                        <field name="credit"/>
+                        <field name="debit"/>
+                    </tree>
+                </field>
+            </sheet>
+        </form>
+    </field>
+</record>
+<record id="emdad_accounts_journal_view_kanban" model="ir.ui.view">
+    <field name="name">emdad_accounts_journal.view.kanban</field>
+    <field name="model">emdad.accounts.journal</field>
+    <field name="arch" type="xml">
+        <kanban>
+            <templates>
+                <t t-name="kanban-box">
+                <div t-attf-class="oe_kanban_global_click">
+                                <div class="o_kanban_image">
+                                    <img alt="Avatar" t-att-src="kanban_image('emdad.accounts.journal', 'journal_icon',record.id.raw_value)"/>
+                                </div>
+                                <div class="oe_kanban_details">
+                                    <strong class="o_kanban_record_title">
+                                    <field name="name"/>
+                                    </strong>
+                                <div>
+                                    <field name="journal_type" widget="badge"/>                                     
+                                </div>
+                                <div invisible="journal_type != 'bank'">
+                                     Bank Balance <field name="balance_bank"/>
+                                </div>
+                                <div invisible="journal_type != 'cash'">
+                                     Bank Balance <field name="balance_cash"/>
+                                </div>
+                                   
+                                </div>
+                            </div>
+                    
+                </t>
+            </templates>
+        </kanban>
+    </field>
+</record>
+<record model="ir.actions.act_window" id="emdad_credit_facility_windows">
+        <field name="name">Company Journals</field>
+        <field name="res_model">emdad.credit.facility</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
+<record model="ir.actions.act_window" id="journal_entry_emdad_windows">
+        <field name="name">Company Journals</field>
+        <field name="res_model">emdad.journal.entry</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
+<record model="ir.actions.act_window" id="journals_emdad_windows">
+        <field name="name">Company Journals</field>
+        <field name="res_model">emdad.accounts.journal</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
+<record model="ir.actions.act_window" id="accounts_emdad_windows">
+        <field name="name">Chart of Accounts</field>
+        <field name="res_model">emdad.accounts</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
+<record model="ir.actions.act_window" id="accounts_types_emdad_windows">
+        <field name="name">Chart of Accounts Types</field>
+        <field name="res_model">emdad.accounts.type</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
+<menuitem
+    id="finance_system_menu"
+    name="Finance"
+    sequence="10"/>
+    <menuitem
+        id="finance_resources_menu"
+        name="Resources"
+        parent="finance_system_menu"
+        sequence="10"/>
+        <menuitem
+            id="finance_journal_entry_menu"
+            name="Journal Entries"
+            action="journal_entry_emdad_windows"
+            parent="finance_resources_menu"
+            sequence="10"/>
+    <menuitem
+        id="finance_settings_menu"
+        name="Settings"
+        parent="finance_system_menu"
+        sequence="10"/>
+    <menuitem
+        id="chart_of_accounts_menu"
+        name="Accounts"
+        action="accounts_emdad_windows"
+        parent="finance_settings_menu"
+        sequence="10"/>
+     <menuitem
+        id="chart_of_accounts_type_menu"
+        name="Account Types"
+        action="accounts_types_emdad_windows"
+        parent="finance_settings_menu"
+        sequence="10"/>
+         <menuitem
+        id="chart_of_accounts_journal_menu"
+        name="Company Journals"
+        action="journals_emdad_windows"
+        parent="finance_settings_menu"
+        sequence="1"/>
+        <menuitem
+            id="emdad_credit_facility_menu"
+            name="Credit Facility"
+            action="emdad_credit_facility_windows"
+                    parent="finance_settings_menu"
+
+            sequence="10"/>
+</emdad>

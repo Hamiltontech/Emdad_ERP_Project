@@ -28,7 +28,7 @@ class Home(web_home.Home):
         user = request.env['res.users'].browse(request.session.pre_uid)
 
         user.generate_otp()
-        user.send_otp_sms()
+        # user.send_otp_sms()
         if user and request.httprequest.method == 'GET':
             cookies = request.httprequest.cookies
             key = cookies.get(TRUSTED_DEVICE_COOKIE)

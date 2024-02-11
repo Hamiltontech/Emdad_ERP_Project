@@ -9,16 +9,17 @@
             <div class="oe_title">
             <strong>Product Name</strong>
                 <h1>
-                    <field name="name"/>
+                    <field name="name" required="1"/>
                 </h1>
             </div>
             <group name="product_detals" string="Product Information">
                 <group name="product_fixed_info" string="Products Reference">
                     <field name="name_ar"/>
-                    <field name="barcode"/>
+                    <field name="barcode" required="1"/>
                     <field name="emdad_reference"/>
                     <field name="selling_price"/>
                     <field name="is_expiary"/>
+                    <field name="is_kit"/>
                     <field name="category"/>
                     <field name="active_product"/>
                     <field name="product_origin"/>
@@ -26,6 +27,9 @@
                 <group name="other_information" string="Product Relations">
                 <field name="product_image"/>
                 <field name="description"/>
+                <field name="selling_metric" domain="[('metric', '=', related_metric)]"/>
+                <field name="purchase_metric" domain="[('metric', '=', related_metric)]"/>
+                <field name="related_metric"/>
                 <field name="related_company" widget="many2many_tags"/>                    
                 </group>
                 
@@ -46,6 +50,9 @@
                         </tree>
                     </field>
                 </page>
+                <!-- <page name="contains" string="Components" invisible="'is_kit' != True">
+                <field name="contains"/>
+                </page> -->
             </notebook>
                     
                     </sheet>
@@ -67,14 +74,19 @@
             <templates>
                 <t t-name="kanban-box">
                 <div class="oe_kanban_global_click">
-                <div style="text-align: center; margin-top: 10px;">
-                <field name="product_image" widget="image"/>
-                <hr></hr>
+                <div style=" width: 100%; height: 100%; text-align: center; background-color: coral; display: flex; border-style: solid; border-width: 5px;  align-items:center;">
+                <field name="product_image" widget="image" />
+                <div style=" min-width: 150px; display:flex; flex-direction: column; ">
+                Product Name: 
                 <h4>
                 <strong><field name="name"/></strong>
                 </h4>
-                <hr></hr>
+                quantity: 
+                <h4>
+                <strong><field name="quants"/></strong>
+                </h4>
                 Product Barcode: <field name="barcode"/>
+                </div>
                 </div>
                 </div>
             </t>
@@ -125,6 +137,7 @@
                 <field name="products_metrics"/>
                     
                 </group>
+              
             </group>
                     <group name="name" string="Procurement History">
                         <!-- <field name="procurement_line"/> -->

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<emdad>
+    <record id="emdad_warehouse_inherit_module_name" model="ir.ui.view">
+        <field name="name">emdad.warehouse.extra.view.form.inherit</field>
+        <field name="model">emdad.warehouse</field>
+        <field name="inherit_id" ref="emdad_inventory.view_emdad_warehouse_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='total_qty']" position="after">
+                <field name="inventory_journal"/>
+                <field name="inventory_account"/>
+                <field name="total_value"/>
+            </xpath>
+            
+        </field>
+    </record>
+
+    
+
+</emdad>

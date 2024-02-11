@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_emdad_sales,Emdad Sales Access,model_emdad_sales,base.group_user,1,1,1,0
+access_emdad_sales_lines,Emdad Sales Lines Access,model_emdad_sales_line,base.group_user,1,1,1,0
+

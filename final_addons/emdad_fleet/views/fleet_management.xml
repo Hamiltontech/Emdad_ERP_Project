@@ -21,6 +21,7 @@
                         </group>
                         <group>
                             <field name="engine_hp"/>
+                            <field name="related_employee"/>
                             <field name="insurance_plan" context="{'default_related_truck': id}"/>
                             <field name="status" widget="badge"/>
                         </group>                      
