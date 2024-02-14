@@ -26,6 +26,7 @@ class EmdadContacts(models.Model):
     from_wathq = fields.Boolean(string="From Wathiq")
     cr_copy = fields.Binary(string="CR Copy")
     account = fields.Selection([('verified','Verified'), ('not','Not Verified')], string="Status", default="not")
+    category = fields.Many2one("emdad.product.category", string="Category")
 
     @api.onchange('cr_number')
     def on_change_cr_number(self):

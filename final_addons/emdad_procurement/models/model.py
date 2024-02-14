@@ -35,6 +35,17 @@ class EmdadProcurement(models.Model):
     credit_facility = fields.Many2one("emdad.credit.facility", string="Credit Facility")
     credit_value = fields.Float(string="Credit Value", related="credit_facility.amount")
     credit_balance = fields.Float(string="Credit Balance", related="credit_facility.balance")
+    emdad_category = fields.Many2one("product.emdad.category", string="Category")
+    related_tender = fields.Many2one("emdad.tender", string="Related Tender")
+    
+    @api.onchange('emdad_category')
+    def change_category(self):
+        for record in self: 
+            if record.emdad_category:
+                for line in record.procurement_lines:
+                    line.product_category = record.emdad_category
+            else:
+                pass
     def create_payment(self):
         payment = self.env['emdad.journal.entry']
         for record in self:
@@ -215,6 +226,7 @@ class EmdadProcurementLines(models.Model):
     after_tax = fields.Float(string="Total Inc.")
     related_metric = fields.Many2one("product.metrics", related="product_id.related_metric", string="Related Metric")
     proc_status = fields.Selection([('pending', 'Pending'),('active','Active'), ('closed','Closed'), ('expired','Expired'), ('recieve', 'Receiving'), ('recieved','Recieved')], string="Quote Status", default="pending", related="related_procurement.status")
+    product_category = fields.Many2one("product.emdad.category", string="Product Category")
 
     @api.onchange('product_id')
     def get_default_metric(self):
@@ -295,3 +307,13 @@ class EmdadProcurementLines(models.Model):
             else:
                 record.discount = 0
                 record.final_total = record.total
+
+class EmdadTender(models.Model):
+    _name="emdad.tender"
+
+    name = fields.Char(string="Tender ID")
+    exp_date = fields.Date(string="Expiary Date")
+    status = fields.Selection([('draft','Darft RFP'), ('rfp','RFP'), ('po','Purchase Order'), ('bill','Billing'), ('recieve','Receiving')], string="Status")
+    terms = fields.Html(string="Terms")
+    procurements = fields.One2many("emdad.procurement", "related_tender", string="Procurements")
+    products = fields.Many2many("emdad.line.procurement", string="Products")
