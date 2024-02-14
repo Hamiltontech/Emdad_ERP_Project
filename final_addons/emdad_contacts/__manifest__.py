@@ -7,7 +7,7 @@ Send KPI Digests periodically
 """,
     'version': '1.1',
     'depends': [
-        'base'
+        'base','products_management'
     ],
     'data': [
         'security/ir.model.access.csv',

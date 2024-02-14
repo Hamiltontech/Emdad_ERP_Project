@@ -298,13 +298,13 @@
                     <group string="Tender Information">
                         <field name="exp_date"/>
                     </group>
-                    <field name="products" widget="One2many_list">
+                    <!-- <field name="products" widget="One2many_list">
                         <tree editable="bottom">
                             <field name="product_category"/>
                             <field name="product"/>
                             <field name="barcode"/>
                         </tree>
-                    </field>
+                    </field> -->
                 </sheet>
             </form>
         </field>

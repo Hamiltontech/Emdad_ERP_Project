@@ -293,9 +293,9 @@ class EmdadProcurement(models.Model):
                         line['metric'] = line['metric'][0]
                         line['product_id'] = line['product_id'][0]
                         line['recieved_qty'] = 0
+                        line['product_category'] = line['product_category'][0]
                         new_procurement_line = self.env['emdad.line.procurement'].create(line)
                         print(new_procurement_line)
-        record.procurement_backorder = False
 
 
 class EmdadProcurementLines(models.Model):
