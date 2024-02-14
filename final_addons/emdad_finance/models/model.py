@@ -209,7 +209,7 @@ class EmdadCreditFacility(models.Model):
     end_date = fields.Date(string="End Date")
     status = fields.Selection([('active','Active'), ('expired','Expired')], string="LC Status")
     vendor = fields.Many2one("emdad.contacts", string="Vendor")
-    vendor_cr = fields.Char(string="Vendor CR", related="vendor.cr_number")
+    vendor_cr = fields.Char(string="Vendor CR")
     credit_number = fields.Char(string="Credit Number")
     credit_source = fields.Selection([('emdad','Emdad'), ('vendor','From Vendor')], string="Credit Source")
     lc_account = fields.Many2one("emdad.accounts", string="Credit Account")

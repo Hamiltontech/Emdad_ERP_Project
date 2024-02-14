@@ -204,20 +204,18 @@ class EmdadProcurement(models.Model):
     @api.onchange('status','procurement_lines')
     def _get_backorder(self):  
         for record in self:
-            if record.status == "recieve":
-                procurement_lines =  self.env['emdad.line.procurement']
+            procurement_lines =  self.env['emdad.line.procurement']
 
-                subquery = procurement_lines.search([
-                    ('difference', '<',0 ),('related_procurement','=',record.id)
-                ])
-                subquery =len(subquery.read()) 
-                print("********",subquery)
-                if subquery > 0 :
-                    record.procurement_backorder = True
-                else:
-                    record.procurement_backorder = False
+            subquery = procurement_lines.search([
+                ('difference', '<',0 ),('related_procurement','=',record.id)
+            ])
+            subquery =len(subquery.read()) 
+            print("********",subquery)
+            if subquery > 0 :
+                record.procurement_backorder = True
             else:
                 record.procurement_backorder = False
+
 
     def create_back_order (self):
         for record in self:
@@ -231,45 +229,62 @@ class EmdadProcurement(models.Model):
                 procurement_query = self.env['emdad.procurement'].search([('id','=',procurement_id)])
                 procurement_records = procurement_query.read()
                 for record in procurement_records:
-                    print("===========================",record)
-                vals = {
-                    'effective_date': record['effective_date'],
-                    'operation_type' : record['operation_type'],
-                    'vendors' : record['vendors'],
-                    'vendor_phone' : record['vendor_phone'],
-                    'procurement_lines' : record['procurement_lines'],
-                    'process_type' : record['process_type'],
-                    'payment_type' : record['payment_type'],
-                    'distribution_type' : record['distribution_type'],
-                    'total_before_discount' : record['total_before_discount'],
-                    'total_discount' : record['total_discount'],
-                    'total_amount' : record['total_amount'],
-                    'status' : record['status'],
-                    'published' : record['published'],
-                    'exp_quote' : record['exp_quote'],
-                    'single_location' : record['single_location'] if record['single_location'][0] is not False else False,
-                    'is_multiple' : record['is_multiple'],
-                    'all_info' : record['all_info'],
-                    'in_recieve' : record['in_recieve'],
-                    'recieved' : record['recieved'],
-                    'related_bill' : record['related_bill'],
-                    'bill_status' : record['bill_status'],
-                    'amount_pay' : record['amount_pay'],
-                    'payment_date' : record['payment_date'],
-                    'payment_journal' : record['payment_journal'],
-                    'payment_status' : record['payment_status'],
-                    'credit_facility' : record['credit_facility'],
-                    'credit_value' : record['credit_value'],
-                    'credit_balance' : record['credit_balance'],
-                    'stages' : record['stages'],
-                    'procurement_backorder' : record['procurement_backorder'],
-                    'display_name' : record['display_name'],
-                    'create_uid' : record['create_uid'],
-                    'create_date' : record['create_date']
-                }
-                print(vals)
-                new_procurement_record = self.env['emdad.procurement'].create(vals)
-                print(new_procurement_record)
+
+                    procurement_vals = {
+                        'effective_date': record['effective_date'],
+                        'operation_type' : record['operation_type'],
+                        'vendors' : record['vendors'],
+                        'vendor_phone' : record['vendor_phone'],
+                        'procurement_lines' : [],
+                        'process_type' : record['process_type'],
+                        'payment_type' : record['payment_type'],
+                        'distribution_type' : record['distribution_type'],
+                        'total_before_discount' : record['total_before_discount'],
+                        'total_discount' : record['total_discount'],
+                        'total_amount' : record['total_amount'],
+                        'status' : record['status'],
+                        'published' : record['published'],
+                        'exp_quote' : record['exp_quote'],
+                        'single_location' : record['single_location'][0],
+                        'is_multiple' : record['is_multiple'],
+                        'all_info' : record['all_info'],
+                        'in_recieve' : record['in_recieve'],
+                        'recieved' : record['recieved'],
+                        'related_bill' : record['related_bill'],
+                        'bill_status' : record['bill_status'],
+                        'amount_pay' : record['amount_pay'],
+                        'payment_date' : record['payment_date'],
+                        'payment_journal' : record['payment_journal'],
+                        'payment_status' : record['payment_status'],
+                        'credit_facility' : record['credit_facility'],
+                        'credit_value' : record['credit_value'],
+                        'credit_balance' : record['credit_balance'],
+                        'stages' : record['stages'],
+                        'procurement_backorder' : record['procurement_backorder'],
+                        'display_name' : record['display_name'],
+                        'create_uid' : record['create_uid'],
+                        'create_date' : record['create_date']
+                    }
+                    new_procurement_record = self.env['emdad.procurement'].create(procurement_vals)
+                    new_procurement_record_data = new_procurement_record.read()
+                    new_procurement_record_id = new_procurement_record_data[0]['id']
+                    print(new_procurement_record_id)
+
+                    target_procurement_line_id = record['procurement_lines']
+                    record_procurement_lines = self.env['emdad.line.procurement'].search([('id','=',target_procurement_line_id)])
+                    record_procurement_lines_data = record_procurement_lines.read()
+                    for line in record_procurement_lines_data:
+                        qty = line['difference']
+                        line['request_qty'] = qty
+                        line['difference'] = 0
+                        line['related_procurement'] = new_procurement_record_id
+                        line['location'] = line['location'][0]
+                        line['metric'] = line['metric'][0]
+                        line['product_id'] = line['product_id'][0]
+                        line['recieved_qty'] = 0
+                        new_procurement_line = self.env['emdad.line.procurement'].create(line)
+                        print(new_procurement_line)
+        record.procurement_backorder = False
 
 
 class EmdadProcurementLines(models.Model):
