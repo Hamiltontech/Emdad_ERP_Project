@@ -60,12 +60,11 @@ class EmdadSales(models.Model):
     @api.depends('date','so_status')
     def _get_name(self):
         for record in self:
-            if record.customer and record.date and record.so_status:
-                so_status =str(record.so_status)
+            if record.customer and record.date:
                 year = str(record.date.year)
                 month = str(record.date.month).zfill(2)
                 sequence = str(record.id).zfill(5)
-                record.name = "SALES" + '/' + so_status.upper() + '/' + year + '/' + month + '/' + sequence
+                record.name = "SALES" + '/' + year + '/' + month + '/' + sequence
             else:
                 record.name="Draft Entry"
     
@@ -105,6 +104,14 @@ class EmdadSalesLines(models.Model):
     tax_amount = fields.Float(string="Tax Amount", readonly=True)
     after_tax = fields.Float(string="Total Inc.", compute="_calculate_tax")
     in_delivery = fields.Boolean(string="In Delivery", related="related_sales.in_delivery")
+    ##
+    product_image = fields.Binary(string="Product Image", related="product_id.product_image")
+    product_id = fields.Many2one("product.management", string="Product", ondelete="cascade")
+    description = fields.Text(string="Description")
+    barcode = fields.Char(string="Barcode", related="product_id.barcode")
+    attach = fields.Binary(string="Specifications")
+    request_qty = fields.Float(string="Quantity")
+
     @api.depends('recieved_qty')
     def _get_status(self):
         for record in self:

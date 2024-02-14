@@ -20,6 +20,6 @@ class Procurement(http.Controller):
         return werkzeug.wrappers.Response(
             status=200,
             content_type="application/json; charset=utf-8",
-            headers=[("Cache-Control", "no-store"), ("Pragma", "no-cache"),("Access-Control-Allow-Origin","*")],
+            headers=[("Cache-Control", "no-store"), ("Pragma", "no-cache"),("Access-Control-Allow-Origin","*"),("Access-Control-Allow-Headers","*")],
             response=json.dumps(records, default=str)
         )

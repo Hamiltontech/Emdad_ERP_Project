@@ -40,17 +40,13 @@ class ProductManagement(models.Model):
 
     def get_total_counted_qty(self):
         for record in self:
-            print("*****************",record.id)
             quants_lines = self.env['emdad.warehouse.quants.lines']
             subquery = quants_lines.search([
                 ('product_id', '=', record.id)
             ])
             subquery = subquery.read(['counted_qty'])
-            print(subquery)
             
             total_count = sum(line['counted_qty'] for line in subquery)
-            print("---------",total_count)
-            print(record.id)
             record.quants = total_count
     
     def _compute_total_procurement_count(self):

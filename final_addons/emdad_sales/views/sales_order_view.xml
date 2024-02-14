@@ -1,92 +1,217 @@
 <?xml version="1.0" encoding="utf-8"?>
 <emdad>
-<record id="emdad_sales_view_form" model="ir.ui.view">
-    <field name="name">emdad_sales.view.form</field>
-    <field name="model">emdad.sales</field>
-    <field name="arch" type="xml">
-        <form string="">
-            <header>
-            <button type="object" name="approve_sales" string="Approve" invisible="so_status == 'approved'"/>
-            <button type="object" name="cancel_sales" string="Cancel" invisible="so_status == 'cancelled'"/>
-            <button type="object" name="create_delivery" string="Create Delivery"/>
-            <field name="so_status" widget="statusbar" statusbar_visible="new,approved,cancelled,in_delivery,delivered"/>
-            </header>
-            <sheet>
-            <div class="oe_title">
-            <h1>
-                <span style='float: right; font-size:2rem;'><field name="stages"/></span>
-                <field name="name"/>
-            </h1>
-            </div>
-                <group string="Customer Information">
-                    <group>
-                        <field name="customer"/>
-                        <field name="phone"/>
-                        <field name="email"/>
+    <record id="emdad_sales_view_form" model="ir.ui.view">
+        <field name="name">emdad_sales.view.form</field>
+        <field name="model">emdad.sales</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <header>
+                    <button type="object" name="approve_sales" string="Approve"
+                        invisible="so_status == 'approved'" />
+                    <button type="object" name="cancel_sales" string="Cancel"
+                        invisible="so_status == 'cancelled'" />
+                    <button type="object" name="create_delivery" string="Create Delivery" />
+                    <field name="so_status" widget="statusbar"
+                        statusbar_visible="new,approved,cancelled,in_delivery,delivered" />
+                </header>
+                <sheet>
+                    <div class="oe_title"> sales ID <h1>
+                            <span style='float: right; font-size:2rem;'>
+                                <field name="stages" />
+                            </span>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group string="Customer Information">
+                        <group>
+                            <field name="customer" />
+                            <field name="phone" />
+                            <field name="email" />
+                        </group>
+                        <group>
+                            <field name="cr_number" />
+                        </group>
                     </group>
-                    <group>
-                        <field name="cr_number"/>
+                    <group string="Logistics Information">
+                        <group>
+                            <field name="effective_date" required="1" />
+                            <field name="date" required="1" />
+                            <field name="delivery_type" />
+                            <field name="location" invisible="delivery_type != 'single'" />
+                        </group>
+                        <group>
+                            <field name="effective_date" />
+                            <field name="date" />
+                            <field name="delivery_type" />
+                            <field name="location" invisible="delivery_type != 'single'" />
+                        </group>
+                        <group>
+                        </group>
                     </group>
+                    <notebook>
+                        <page name="product_list" string="Products">
+                            <field name="order_lines" widget="one2many_list"
+                                context="{'default_location': location}">
+                                <kanban>
+                                    <t t-name="kanban-box">
+                                        <div t-attf-class="oe_kanban_global_click">
+                                            <t t-name="kanban-box">
+                                                <div t-attf-class="oe_kanban_global_click">
+                                                    <div class="o_kanban_image">
+                                                        <img
+                                                            t-att-src="kanban_image('emdad.sales.line', 'product_image', record.id.raw_value)"
+                                                            alt="Book"
+                                                            class="o_image_128_contain" />
+                                                    </div>
+                                                    <div class="oe_kanban_details">
+                                                        <strong class="o_kanban_record_title">
+                                                            <field name="product_id" />
+                                                        </strong>
+                                                        <div> Requested Quantity: <field
+                                                                name="recieved_qty" /> <field
+                                                                name="metric" />
+                                                            <br></br> Barcode: <field
+                                                                name="barcode" />
+                                                            <field
+                                                                name="sent_status" invisible="1" />
+                                                        </div>
+                                                        <div invisible="sent_status == 'full'">
+                                                            Recieved Quantity : <field
+                                                                name="recieved_qty" /> <field
+                                                                name="metric" />
+                                                            <!-- <br></br> Difference: <field
+                                                            name="difference" /> <field
+                                                            name="metric" /> -->
+                                                            <br></br>
+                                                            <field
+                                                                name="sent_status" widget="badge"
+                                                                invisible="sent_status == 'not'" />
+
+                                                        </div>
+                                                        <div invisible="sent_status == 'not'"> Total
+                                                            : <field name="after_tax" /> SAR </div>
+
+                                                        <div>
+                                                            <hr></hr>
+                                                            <field name="description" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </t>
+                                </kanban>
+                            </field>
+                        </page>
+                        <page name="delivery" string="Delivery Information"
+                            invisible="so_status != 'in_delivery'">
+                            <field name="order_lines" widget="One2many_list">
+                                <tree editable="bottom">
+                                    <field name="barcode" />
+                                    <field name="product_id" />
+                                    <field name="attach" widget="download_link"
+                                        options="{'filename': 'attach_fname'}" />
+                                    <!-- <field name="request_qty" /> -->
+                                    <field name="recieved_qty" />
+                                    <!-- <field name="difference" /> -->
+                                    <field name="metric" />
+                                    <field name="sent_status" />
+                                    <!-- <field name="is_multiple" invisible="1" optional="hide" /> -->
+                                    <!-- <field name="location" invisible="is_multiple != True" /> -->
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="emdad_sales_quick_view_form" model="ir.ui.view">
+        <field name="name">emdad_sales_quick.view.form</field>
+        <field name="model">emdad.sales</field>
+        <field name="arch" type="xml">
+            <form string="Quick Edit Form">
+                <group>
+                    <field name="location" string="Location" />
+                    <field name="customer" domain="[('contact_type', '=', 'customer')]" />
+                    <field name="delivery_type" string="Delivery" />
+                    <field name="date" string="Date Assigned" />
+                    <field name="effective_date" string="Assigned Date" />
                 </group>
-                <group string="Logistics Information">
-                    <group>
-                        <field name="effective_date" required="1"/>
-                        <field name="date" required="1"/>
-                        <field name="delivery_type"/>
-                        <field name="location" invisible="delivery_type != 'single'"/>
-                    </group>
-                    <group>
-                        <field name="effective_date"/>
-                        <field name="date"/>
-                        <field name="delivery_type"/>
-                        <field name="location" invisible="delivery_type != 'single'"/>
-                    </group>
-                    <group>
-                    </group>
-                </group>
-                <field name="order_lines" widget="one2many_list" context="{'default_location': location}">
-                    <tree>
-                        <field name="product"/>
-                        <field name="barcode"/>
-                        <field name="location" readonly="delivery_type == 'single'"/>
-                        <field name="batch" domain="[('product_id', '=', product)]"/>
-                        <field name="price"/>
-                        <field name="metric_unit" domain="[('metric', '=', metric)]"/>
-                        <field name="metric" />
-                        <field name="qty"/>
-                        <field name="recieved_qty" readonly="in_delivery != True"/>
-                        <field name="sent_status" readonly="in_delivery != True"/>
-                        <field name="discount"/>
-                        <field name="tax"/>
-                        <field name="total"/>
-                        <field name="final_total"/>
-                        <field name="tax_amount"/>
-                        <field name="after_tax"/>
-                        <field name="delivery_type" optional="hidden"/>
-                        <field name="in_delivery"/>
-                    </tree>
-                </field>
-                <field name="total"/>
-            </sheet>
-        </form>
-    </field>
-</record>
-<record model="ir.actions.act_window" id="emdad_sales_windows">
+            </form>
+        </field>
+    </record>
+
+    <record id="emdad_sales_view_kanban" model="ir.ui.view">
+        <field name="name">emdad_sales_kanban.view.kanban</field>
+        <field name="model">emdad.sales</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="so_status"
+                quick_create_view="emdad_sales.emdad_sales_quick_view_form"
+                on_create="quick_create">
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="row mb4">
+                                <div class="col-6 o_kanban_record_headings">
+                                    <strong>
+                                        <span>
+                                            <field name="name" />
+                                        </span>
+                                    </strong>
+                                </div>
+                        
+                            </div>
+                            <div class="oe_kanban_body">
+                                <field name="so_status" widget="badge" />
+                                <hr></hr> Delivery Type
+                                Type: <field name="delivery_type" />
+                                <hr></hr> Assigned Date: <field
+                                    name="effective_date" />
+                                <hr></hr> Date Assigned: <field
+                                    name="date" />
+                                <hr></hr> Customer: <field
+                                name="customer" />
+                            </div>
+                            <div class="oe_kanban_footer">
+                                <!-- <div class="oe_kanban_footer_left">
+                                    <field name="published" widget="toggle" invisible="1" />
+                                </div> -->
+                                <hr></hr>
+                                <div class="oe_kanban_footer_right">
+                                    <!-- <button string="Publish" type="object" name="publish_quote"
+                                        invisible="published == True, operation_type == 'direct'"
+                                        class="oe_highlight" /> -->
+                                </div>
+                            </div>
+                            <div class="oe_clear" />
+
+                        </div>
+
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="emdad_sales_windows">
         <field name="name">Sales Management</field>
         <field name="res_model">emdad.sales</field>
         <field name="view_mode">kanban,form</field>
         <field name="domain">[]</field>
     </record>
-<menuitem
-    id="emdad_sales_menu"
-    name="Sales Management"
-    sequence="10"/>
-<menuitem
-    id="emdad_sales_sub_menu"
-    name="Sales Management"
-    action="emdad_sales_windows"
-    parent="emdad_sales_menu"
-    sequence="10"/>
     
+    <menuitem
+        id="emdad_sales_menu"
+        name="Sales Management"
+        sequence="10" />
+    <menuitem
+        id="emdad_sales_sub_menu"
+        name="Sales Management"
+        action="emdad_sales_windows"
+        parent="emdad_sales_menu"
+        sequence="10" />
+
 
 </emdad>

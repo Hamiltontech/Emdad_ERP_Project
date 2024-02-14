@@ -57,6 +57,8 @@
                     <field name="total_discount"/>
                     <field name="total_amount"/>
                     <field name="payment_status" invisible="1"/>
+                    <field name="procurement_backorder" invisible="1"/>
+                    <button string="Create Backorder" type="object" name="create_back_order" invisible="procurement_backorder == False" class="oe_highlight"/>
                 </group>
                     
                 </group>
@@ -158,6 +160,7 @@
         </form>
     </field>
    </record>
+   
    <record id="emdad_line_procurement_view_form" model="ir.ui.view">
     <field name="name">emdad_line_procurement.view.form</field>
     <field name="model">emdad.line.procurement</field>
@@ -229,8 +232,10 @@
         <field name="model">emdad.procurement</field>
         <field name="arch" type="xml">
             <kanban default_group_by="process_type"
-quick_create_view="emdad_procurement.emdad_procurement_quick_view_form"
-on_create="quick_create">
+                    quick_create_view="emdad_procurement.emdad_procurement_quick_view_form"
+                    class="o_kanban_small_column"
+                    on_create="quick_create"
+                    sample="1">
                 <templates>
                     <t t-name="kanban-box">
                         <div t-attf-class="oe_kanban_global_click">
