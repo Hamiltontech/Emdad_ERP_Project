@@ -50,6 +50,7 @@
                         <field name="related_company"/>
                         <field name="description"/>
                         <field name="description_ar"/>
+                        <field name="category"/>
                     </group>
                     <group>
                         <field name="cr_number"/>
