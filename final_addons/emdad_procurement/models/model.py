@@ -279,13 +279,12 @@ class EmdadProcurement(models.Model):
                     new_procurement_record = self.env['emdad.procurement'].create(procurement_vals)
                     new_procurement_record_data = new_procurement_record.read()
                     new_procurement_record_id = new_procurement_record_data[0]['id']
-                    print(new_procurement_record_id)
 
                     target_procurement_line_id = record['procurement_lines']
                     record_procurement_lines = self.env['emdad.line.procurement'].search([('id','=',target_procurement_line_id)])
                     record_procurement_lines_data = record_procurement_lines.read()
                     for line in record_procurement_lines_data:
-                        qty = line['difference']
+                        qty = abs(line['difference'])
                         line['request_qty'] = qty
                         line['difference'] = 0
                         line['related_procurement'] = new_procurement_record_id
