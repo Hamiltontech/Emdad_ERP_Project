@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="myService"/>
+    <t t-name="awesome_dashboard.AwesomeDashboard">
+        <center>
+            <h1> Products Dashboard</h1>
+        </center>
+    </t>
+    <div t-name="Parent">
+        <Child>
+            <span>some content</span>
+        </Child>
+    </div>
+</templates>

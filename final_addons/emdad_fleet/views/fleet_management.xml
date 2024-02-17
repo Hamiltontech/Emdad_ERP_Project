@@ -1,5 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <emdad>
+    <record id="emdad_fleet_view_kanban" model="ir.ui.view">
+        <field name="name">emdad_fleet.view.kanban</field>
+        <field name="model">emdad.fleet</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <templates>
+                    <t t-name="kanban-box">
+                        <kanban>
+                            <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_global_click">
+                            <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_global_click">
+                            <div style="padding: 4px; text-align: center;">
+                                <field name="container_status" widget="badge"/>
+                            </div>
+                             <div style="text-align: center; border: 4px solid black; padding-top: 10px; padding-bottom: 10px;">
+                                    <field name="name"/>
+                                    </div>
+                                <div class="oe_kanban_details">
+                               
+                                    <div class="o_kanban_record_title">
+                                                                        
+                                    <i class="fa  fa-truck"/> Model:  
+                                    <field name="model"/>
+                                    <br></br>
+                                    <i class="fa  fa-calendar"/>
+                                    Year <field name="year"/>
+                                    <br></br>
+                                    <i class="fa  fa-arrows-alt"/>
+                                    Container <field name="related_location"/>
+                                    <br></br>
+                                    </div>
+                                    
+                                </div>
+                                </div>
+                        </t>
+                        </div>
+                        </t>
+                    </kanban>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
     <record id="emdad_fleet_view_form" model="ir.ui.view">
         <field name="name">emdad_fleet.view.form</field>
         <field name="model">emdad.fleet</field>

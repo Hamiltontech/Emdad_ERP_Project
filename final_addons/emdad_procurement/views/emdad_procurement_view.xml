@@ -240,43 +240,44 @@
                     on_create="quick_create"
                     sample="1">
                 <templates>
-                    <t t-name="kanban-box">
-                        <div t-attf-class="oe_kanban_global_click">
-                        <div class="row mb4">
-                                    <div class="col-6 o_kanban_record_headings">
-                                        <strong>
-                                            <span>
-                                                <field name="name"/>
-                                            </span>
-                                        </strong>
+                  <t t-name="kanban-box">
+                               <div t-attf-class="oe_kanban_global_click">
+                                <t t-name="kanban-box">
+                                    <div t-attf-class="oe_kanban_global_click">
+                                        <div class="o_kanban_image">
+                                            <img src="https://i.imgur.com/UnPh60y.png" height="150px" invisible="process_type != 'direct'"/>
+                                            <img src="https://i.imgur.com/T65O5f1.png" height="150px" invisible="process_type != 'market'"/>
+                                            <img src="https://i.imgur.com/27DAaok.png" height="150px" invisible="process_type != 'multiple'"/>
+                                        </div>
+                                        <div class="oe_kanban_details">
+                                            <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                            <br></br>
+                                            </strong>
+                                            <field name="process_type"/>
+                                            <br></br>
+                                            <i class="fa fa fa-calendar"/>
+                                            Date : <field name="effective_date"/>
+                                            <br></br> 
+                                            <i class="fa  fa-random"/> <field name="emdad_category"/>              
+                                            <div invisible="process_type != 'market'">
+                                            <i class="fa fa-globe"/>
+                                            Emdad Market
+                                            </div>
+                                             <div invisible="process_type != 'direct'">
+                                            <field name="vendor" widget="badge"/>
+                                            </div>
+                                            <div invisible="process_type != 'multiple'">
+                                            <i class="fa fa fa-bandcamp"/> Assigned 
+                                            <field name="number_vendors"/> Vendors
+                                            </div>
+                                            <br></br>
+                                            
+                                        </div>
                                     </div>
-                                    <div class="col-6 text-end">
-                                        <strong><field name="effective_date"/></strong>
-                                    </div>
+                                </t>
                                 </div>
-                            <div class="oe_kanban_body">
-                                <field name="process_type" widget="badge"/>
-                                <hr></hr>
-                                Operation Type: <field name="operation_type"/>
-                                <hr></hr>
-                                Expiartion: <field name="exp_quote"/>
-                                <hr></hr>
-                                Distribution: <field name="distribution_type"/>
-                            </div>
-                            <div class="oe_kanban_footer">
-                            <div class="oe_kanban_footer_left">
-                                <field name="published" widget="toggle" invisible="1"/>
-                            </div>
-                            <hr></hr>
-                            <div class="oe_kanban_footer_right">
-                                  <button string="Publish" type="object" name="publish_quote" invisible="published == True, operation_type == 'direct'" class="oe_highlight"/>
-                            </div>
-                            </div>
-                            <div class="oe_clear"/>
-
-                        </div>
-                        
-                    </t>
+                                </t>
                 </templates>
             </kanban>
         </field>
@@ -298,13 +299,61 @@
                     <group string="Tender Information">
                         <field name="exp_date"/>
                     </group>
-                    <!-- <field name="products" widget="One2many_list">
+                    <field name="products" widget="One2many_list">
                         <tree editable="bottom">
                             <field name="product_category"/>
-                            <field name="product"/>
+                            <field name="product_id" domain="[('category', '=', product_category)]"/>
                             <field name="barcode"/>
+                            <field name="description"/>
+                            <field name="attach"/>
+                            <field name="request_qty"/>
+                            <field name="metric"/>
+                            <field name="packaging"/>
                         </tree>
-                    </field> -->
+                        <kanban>
+                              <t t-name="kanban-box">
+                               <div t-attf-class="oe_kanban_global_click">
+                                <t t-name="kanban-box">
+                  <div t-attf-class="oe_kanban_global_click">
+                      <div class="o_kanban_image">
+                          <img t-att-src="kanban_image('emdad.line.procurement', 'product_image', record.id.raw_value)" alt="Book"
+                              class="o_image_128_contain"/>
+                      </div>
+                      <div class="oe_kanban_details">
+                          <strong class="o_kanban_record_title">
+                          <field name="product_id"/>
+                          <br></br>
+                          <field name="product_category"/>
+                          </strong>
+                      <div>
+                             Requested Quantity: <field name="request_qty"/> <field name="metric"/>
+                             <br></br>
+                              Barcode: <field name="barcode"/>
+                              <field name="proc_status" invisible="1"/>
+                      </div>
+                      <div invisible="proc_status == 'recieve'">
+                            Recieved Quantity : <field name="recieved_qty"/> <field name="metric"/>
+                            <br></br>
+                            Difference : <field name="difference"/> <field name="metric"/>
+                            <br></br>
+                            <field name="recieve_status" widget="badge" invisible="proc_status == 'pending'"/>
+
+                      </div>
+                      <div invisible="proc_status == 'pending'">                                                
+                            Total : <field name="after_tax"/> SAR                             
+                      </div>
+                      
+                      <div>
+                      <hr></hr>
+                         <field name="description"/>
+                      </div>
+                      </div>
+                  </div>
+              </t>
+                                </div>
+                                </t>
+                            </kanban>
+                    </field>
                 </sheet>
             </form>
         </field>

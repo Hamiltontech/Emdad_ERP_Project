@@ -1,7 +1,7 @@
 from emdad import api, models, fields
 from emdad.exceptions import ValidationError
 from datetime import datetime, date
-
+from googletrans import Translator
 class ProductManagement(models.Model):
     _name = 'product.management'
     name = fields.Char(string="Product Name",required=True)
@@ -72,11 +72,28 @@ class ProductsCategories(models.Model):
 
     name = fields.Char(string="Category Name")
     code_base = fields.Char(string="Category Code")
+    name_ar = fields.Char(string="Arabic Name")
     parent_key = fields.Char(string="Parent Key")
     parent = fields.Many2one("product.emdad.category", string="Parent Category")
     category_type = fields.Selection([('internal', 'Internal Use'), ('selling', 'Selling Products'), ('consumed', 'Consumed Products')], string="Category Type")
     products_metrics = fields.Many2one("product.metrics", string="Product Metrics")
     categ_fullname = fields.Char(string="Full Name", compute="_generate_categ_name")
+    is_active = fields.Boolean(string="Active Category", default="True")
+
+    def translate_name_to_arabic(self):
+        translator = Translator()
+        for record in self:
+            if record.name:
+                translation = translator.translate(record.name, dest='ar').text
+                record.name_ar = translation
+
+    @api.onchange('name')
+    def _translate_name_to_arabic(self):
+        translator = Translator()
+        for record in self:
+            if record.name:
+                translation = translator.translate(record.name, dest='ar').text
+                record.name_ar = translation
 
     @api.depends('name', 'parent')
     def _generate_categ_name(self):
@@ -91,17 +108,43 @@ class UnitsMetrics(models.Model):
     _name="product.metrics"
 
     name = fields.Char(string="Metric Name")
+    name_ar = fields.Char(string="Metric in Arabic")
     main_reference = fields.Many2one("product.units", string="Main Reference")
-    
+    @api.onchange('name')
+    def _translate_name_to_arabic(self):
+        translator = Translator()
+        for record in self:
+            if record.name:
+                translation = translator.translate(record.name, dest='ar').text
+                record.name_ar = translation
 
 class UnitsMeasure(models.Model):
     _name="product.units"
 
     name = fields.Char(string="Unit of Measure")
+    name_ar = fields.Char(string="Unit in Arabic")
+    short = fields.Char(string="Short Name")
     reference = fields.Float(string="Value")
     metric = fields.Many2one("product.metrics", string="Metric")
     ref_main = fields.Many2one("product.units", related="metric.main_reference", string="Main Reference")
+    products = fields.One2many("product.management", "selling_metric", string="Related Products")
+    product_count = fields.Float(string="# of Products", compute="_get_products")
 
+    @api.depends('products')
+    def _get_products(self):
+        for record in self:
+            if record.products:
+                record.product_count = len(record.products)
+            else:
+                record.product_count = 0
+
+    @api.onchange('name')
+    def _translate_name_to_arabic(self):
+        translator = Translator()
+        for record in self:
+            if record.name:
+                translation = translator.translate(record.name, dest='ar').text
+                record.name_ar = translation
 class ProductsPricing(models.Model):
     _name="emdad.products.pricing"
 
@@ -147,7 +190,15 @@ class ProductPackaging(models.Model):
     _name="emdad.product.packaging"
 
     name = fields.Char(string="Package Name")
+    name_ar = fields.Char(string="Arabic Name")
     reference_unit = fields.Many2one("product.units", string="Unit")
     quantity_holding = fields.Float(string="Capacity")
     total_value = fields.Float(string="Original Value", related="reference_unit.reference")
 
+    @api.onchange('name')
+    def _translate_name_to_arabic(self):
+        translator = Translator()
+        for record in self:
+            if record.name:
+                translation = translator.translate(record.name, dest='ar').text
+                record.name_ar = translation

@@ -5,7 +5,10 @@
     <field name="model">emdad.contacts</field>
     <field name="arch" type="xml">
         <form string="">
+        <header>
         <button string="Invite to Emdad" type="object" name="send_sms_invite"/>
+        <button string="Get From Wathiq" type="object" name="on_cr_number"/>
+        </header>
             <sheet>
             <div style="text-align: center;" invisible="from_wathq != True">
                 <img src="https://i.imgur.com/5bKeR7x.png" width="80px"/>
@@ -21,14 +24,24 @@
                 <field name="name" required="1"/>
             </h1>
             </div>
-            <group>
-                <group>
-                <field name="selling_transactions" invisible="contact_type == 'employee'"/>
-                </group>
-                <group>
-                <field name="procurement_transactions" invisible="contact_type == 'employee'"/>
-                </group>
-            </group>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm">
+                    <center>
+                    <strong>Number of Sales</strong>
+                    <br></br>
+                    <h1><field name="selling_transactions"/></h1>
+                    </center>
+                    </div>
+                    <div class="col-sm">
+                    <center>
+                    <strong>Number of Purchases</strong>
+                    <br></br>
+                    <h1><field name="procurement_transactions"/></h1>
+                    </center>
+                    </div>
+                </div>
+            </div>
                 <group string="Contact Information">
                     <group>
                         <field name="contact_type" required="1" />
@@ -69,20 +82,31 @@
         <field name="model">emdad.contacts</field>
         <field name="arch" type="xml">
             <kanban>
-                <templates>
+                <t t-name="kanban-box">
+                    <div t-attf-class="oe_kanban_global_click">
                     <t t-name="kanban-box">
-                        <div class="oe_kanban_global_click">
-                            <div class="oe_kanban_card" style="text-align: center;">
-                                <h4><span style="color:#909090;">Name: </span><field name="name"/></h4>
-                                <h4><span style="color:#909090;">phone: </span><field name="phone"/></h4>
-                                <h4><span style="color:#909090;">email: </span><field name="email"/></h4>
-                                <hr></hr>
-                                <field name="contact_type" widget="badge"/>
-                                <field name="account" widget="badge"/>
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('emdad.contacts', 'logo_image', record.id.raw_value)" alt="Book"
+                                    class="o_image_128_contain"/>
                             </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                <field name="name"/>
+                                </strong>
+                                <br></br>
+                                    <i class="fa fa-bar-chart"/> Sales 
+                                    <field name="selling_transactions"/> <br></br>
+                                    <i class="fa f fa-truck"/> Purchases
+                                    <field name="procurement_transactions"/>  <br></br>
+                            </div>
+                            <hr></hr>
+                            Category: 
+                            <field name="category"/>
                         </div>
                     </t>
-                </templates>
+                    </div>
+                    </t>
             </kanban>
         </field>
     </record>

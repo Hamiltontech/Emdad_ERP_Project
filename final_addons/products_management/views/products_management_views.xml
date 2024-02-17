@@ -6,20 +6,41 @@
         <field name="arch" type="xml">
             <form class="o_sale_order">
             <sheet>
+            <field name="product_image" widget='image' class="oe_left oe_avatar"/>
             <div class="oe_title">
             <strong>Product Name</strong>
                 <h1>
                     <field name="name" required="1"/>
                 </h1>
             </div>
-            <group>
-                <group>
-                <field name="total_sales_count"/>
-                </group>
-                <group>
-                <field name="total_procurement_count"/>
-                </group>
-            </group>
+            <div class="container" >
+            <div class="row" style=" border: 1px solid #ed6343">
+                <div class="col mr-5" style="background: #faf0e6; padding: 10px;">
+                    <center>
+                    <h3>
+                        <strong>Available</strong><br></br>
+                        <field name="quants"/> <field name="selling_metric" readonly="1"/>
+                   </h3>
+                    </center>
+                </div>
+                <div class="col mr-5" style="background: #faf0e6; padding: 10px;">
+                    <center>
+                    <h3>
+                        <strong>Sold</strong><br></br>
+                        <field name="total_sales_count"/> <field name="selling_metric" readonly="1"/>
+                    </h3>
+                    </center>
+                </div>
+                <div class="col" style="background: #faf0e6; padding: 10px;">
+                    <center>
+                    <h3>
+                        <strong>Bought</strong><br></br>
+                        <field name="total_procurement_count"/> <field name="selling_metric" readonly="1"/>
+                    </h3>
+                    </center>
+                </div>
+                </div>
+            </div>
             <group name="product_detals" string="Product Information">
                 <group name="product_fixed_info" string="Products Reference">
                     <field name="name_ar" required="1"/>
@@ -80,26 +101,92 @@
     <field name="arch" type="xml">
        
         <kanban>
-            <templates>
+                              <t t-name="kanban-box">
+                               <div t-attf-class="oe_kanban_global_click">
+                                <t t-name="kanban-box">
+                                    <div t-attf-class="oe_kanban_global_click">
+                                        <div class="o_kanban_image">
+                                            <img t-att-src="kanban_image('product.management', 'product_image', record.id.raw_value)" alt="Book"
+                                                class="o_image_128_contain"/>
+                                        </div>
+                                        <div class="oe_kanban_details">
+                                            <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                            <br></br>
+                                            </strong>
+                                            <field name="category"/>
+                                            <br></br>
+                                            <hr></hr>
+                                                <i class="fa fa-bar-chart"/> Sold 
+                                                <field name="total_sales_count"/>  <field name="selling_metric"/><br></br>
+                                                <i class="fa f fa-truck"/> Bought
+                                                <field name="total_procurement_count"/>  <field name="selling_metric"/><br></br> <i class="fa f  fa-archive"/> Available
+                                                <field name="quants"/> <field name="selling_metric"/> <br></br>
+                                        </div>
+                                    </div>
+                                </t>
+                                </div>
+                                </t>
+                            </kanban>
+    </field>
+</record>
+<record id="product_units_view_form" model="ir.ui.view">
+    <field name="name">product_units.view.form</field>
+    <field name="model">product.units</field>
+    <field name="arch" type="xml">
+        <form string="">
+            <sheet>
+                <div class="oe_title">
+                    <h1>
+                        <field name="name"/>
+                    </h1>
+                </div>
+                <group string="Unit Settings">
+                    <group>
+                        <field name="short" required="1"/>
+                        <field name="name_ar" required="1"/>
+                        <field name="reference" required="1"/>
+                        <field name="metric" required="1"/>
+                        <field name="ref_main" required="1"/>
+                    </group>
+                    <group>
+                        <field name="product_count"/>
+                    </group>
+                    
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+<record id="product_units_view_kanban" model="ir.ui.view">
+    <field name="name">product_units.view.kanban</field>
+    <field name="model">product.units</field>
+    <field name="arch" type="xml">
+        <kanban>
                 <t t-name="kanban-box">
-                <div class="oe_kanban_global_click">
-                <div style=" width: 100%; height: 100%; text-align: center; background-color: coral; display: flex; border-style: solid; border-width: 5px;  align-items:center;">
-                <field name="product_image" widget="image" />
-                <div style=" min-width: 150px; display:flex; flex-direction: column; ">
-                Product Name: 
-                <h4>
-                <strong><field name="name"/></strong>
-                </h4>
-                quantity: 
-                <h4>
-                <strong><field name="quants"/></strong>
-                </h4>
-                Product Barcode: <field name="barcode"/>
-                </div>
-                </div>
-                </div>
+                <div t-attf-class="oe_kanban_global_click">
+                <t t-name="kanban-box">
+                <div t-attf-class="oe_kanban_global_click">
+                    <div class="oe_kanban_details">
+                        <strong class="o_kanban_record_title">
+                        <field name="name"/>
+                        <br></br>
+                        </strong>
+                        <field name="short"/>
+                        <br></br>
+                        <field name="name_ar"/>
+                        <hr></hr>
+                        <i class="fa fa-bar-chart"/> Products 
+                        <field name="product_count"/>
+                        <br></br>
+                        <i class="fa  fa-random"/>
+                        Reference <field name="ref_main"/>
+                        <br></br>
+                    </div>
+                    </div>
             </t>
-            </templates>
+            </div>
+            </t>
         </kanban>
     </field>
 </record>
@@ -111,10 +198,15 @@
             <templates>
                 <t t-name="kanban-box">
                 <div class="oe_kanban_global_click">
-                <div style="text-align: center; margin-top: 10px;">
-                <h4>
-                <strong><field name="name"/></strong>
-                </h4>
+                <div style="text-align: left; margin-top: 10px;">
+                <h6>
+                <field name="name"/>
+                </h6>
+                <hr></hr>
+                <field name="name_ar"/>
+                <br></br>
+                <small><field name="categ_fullname"/></small>
+                <br></br>
                 </div>
                 </div>
             </t>
@@ -127,6 +219,9 @@
         <field name="model">product.emdad.category</field>
         <field name="arch" type="xml">
             <form class="o_sale_order">
+            <header>
+                <button name="translate_name_to_arabic" type="object" string="Translate"/>
+            </header>
             <sheet>
             <div class="oe_title">
             <strong>Category Name</strong>
@@ -139,8 +234,10 @@
             </div>
             <group name="product_detauls">
                 <group name="product_fixed_info" string="Category Reference">
+                    <field name="name_ar"/>
                     <field name="parent"/>
                     <field name="category_type"/>
+                    <field name="is_active" widget="boolean_toggle"/>
                 </group>
                 <group name="other_information" string="Category Relations">
                 <field name="products_metrics"/>
@@ -153,6 +250,99 @@
                     </group>
                     </sheet>
             </form>
+        </field>
+    </record>
+    <record id="product_metric_view_form" model="ir.ui.view">
+        <field name="name">product_metric.view.form</field>
+        <field name="model">product.metrics</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" required="1"/>
+                        </h1>
+                    </div>
+                    <group string="Metric Settings">
+                        <field name="name_ar"/>
+                        <field name="main_reference" required="1"/>      
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="product_metrics_view_kanban" model="ir.ui.view">
+        <field name="name">product_metrics.view.kanban</field>
+        <field name="model">product.metrics</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <t t-name="kanban-box">
+                <div t-attf-class="oe_kanban_global_click">
+                <t t-name="kanban-box">
+                <div t-attf-class="oe_kanban_global_click">
+                    <div class="oe_kanban_details">
+                        <strong class="o_kanban_record_title">
+                        <field name="name"/>
+                        <br></br>
+                        </strong>
+                        <field name="name_ar"/>
+                    </div>
+                    </div>
+            </t>
+            </div>
+            </t>
+        </kanban>
+        </field>
+    </record>
+    <record id="emdad_product_packaging_view_form" model="ir.ui.view">
+        <field name="name">emdad_product_packaging.view.form</field>
+        <field name="model">emdad.product.packaging</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                <div class="oe_title">
+                    <h1>
+                        <field name="name" required="1"/>
+                    </h1>
+                </div>
+                    <group string="Package Settings">
+                        <field name="name_ar"/>
+                        <field name="reference_unit"/>
+                        <field name="quantity_holding"/>
+                        <field name="total_value"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="emdad_product_packaging_view_kanban" model="ir.ui.view">
+        <field name="name">emdad_product_packaging.view.kanban</field>
+        <field name="model">emdad.product.packaging</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <t t-name="kanban-box">
+                <div t-attf-class="oe_kanban_global_click">
+                <t t-name="kanban-box">
+                <div t-attf-class="oe_kanban_global_click">
+                    <div class="oe_kanban_details">
+                        <strong class="o_kanban_record_title">
+                        <field name="name"/>
+                        <br></br>
+                        </strong>
+                        <field name="name_ar"/>
+                        <hr></hr>
+                        <i class="fa  fa-archive"/> Capacity 
+                        <field name="quantity_holding"/>
+                        <br></br>
+                        <i class="fa  fa-random"/>
+                        Reference <field name="total_value"/> <field name="reference_unit"/>
+                        <br></br>
+                    </div>
+                    </div>
+            </t>
+            </div>
+            </t>
+        </kanban>
         </field>
     </record>
      <record model="ir.actions.act_window" id="products_package_windows">
@@ -180,9 +370,19 @@
     <field name="view_mode">kanban,form</field>
     <field name="domain">[]</field>
    </record>
+    <!-- <record model="ir.actions.client" id="dashboard">
+      <field name="name">Dashboard</field>
+      <field name="tag">awesome_dashboard.dashboard</field>
+    </record> -->
    <!-- Menu -->
 <menuitem id="product_management_menu" name="Products Management"
                   web_icon="hst_chq_system,static/description/icon.png"/>
+            <!-- <menuitem
+                id="product_management_dashboard_menu"
+                name="Dashboard"
+                action="dashboard"
+                parent="product_management_menu"
+                sequence="1"/> -->
          <menuitem id="product_manager_menu"
                   name="Products Management"
                   parent="product_management_menu"
@@ -196,7 +396,7 @@
                   action="products_management.category_management_windows"
         />
          <menuitem id="product_units_menu"
-                  name="Products Units"
+                  name="Products Configuration"
                   parent="product_management_menu"
                   sequence="4"
         />
@@ -215,9 +415,10 @@
          <menuitem id="product_packaging_menu"
                   name="Packaging"
                   parent="product_units_menu"
-                  sequence="1"
+                  sequence="3"
                   action="products_management.products_package_windows"
         />
-       
+   
+
 
 </emdad>

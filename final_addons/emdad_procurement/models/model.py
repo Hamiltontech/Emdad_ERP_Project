@@ -37,9 +37,17 @@ class EmdadProcurement(models.Model):
     credit_balance = fields.Float(string="Credit Balance", related="credit_facility.balance")
     stages = fields.Char(compute="_get_stage", default="RFQ")
     procurement_backorder = fields.Boolean(compute="_get_backorder")
-
+    number_vendors = fields.Float(string="# of Vendors", compute="_number_vendors")
     emdad_category = fields.Many2one("product.emdad.category", string="Category")
     related_tender = fields.Many2one("emdad.tender", string="Related Tender")
+
+    @api.depends('vendors')
+    def _number_vendors(self):
+        for record in self:
+            if record.vendors and record.process_type == 'multiple':
+                record.number_vendors = len(record.vendors)
+            else:
+                record.number_vendors = 0
     
     @api.onchange('emdad_category')
     def change_category(self):
@@ -191,7 +199,7 @@ class EmdadProcurement(models.Model):
                 year = str(record.effective_date.year)
                 month = str(record.effective_date.month).zfill(2)
                 sequence = str(record.id).zfill(5)
-                record.name = "PROCUREMENT" + '/' + year + '/' + month + '/' + sequence
+                record.name = "PO" + '/' + year + '/' + month + '/' + sequence
             else:
                 record.name="Draft Entry"
 
@@ -332,6 +340,7 @@ class EmdadProcurementLines(models.Model):
     related_metric = fields.Many2one("product.metrics", related="product_id.related_metric", string="Related Metric")
     proc_status = fields.Selection([('pending', 'Pending'),('active','Active'), ('closed','Closed'), ('expired','Expired'), ('recieve', 'Receiving'), ('recieved','Recieved')], string="Quote Status", default="pending", related="related_procurement.status")
     product_category = fields.Many2one("product.emdad.category", string="Product Category")
+    related_tender = fields.Many2one("emdad.tender", string="Related Tender")
 
     @api.onchange('product_id')
     def get_default_metric(self):
@@ -421,4 +430,4 @@ class EmdadTender(models.Model):
     status = fields.Selection([('draft','Darft RFP'), ('rfp','RFP'), ('po','Purchase Order'), ('bill','Billing'), ('recieve','Receiving')], string="Status")
     terms = fields.Html(string="Terms")
     procurements = fields.One2many("emdad.procurement", "related_tender", string="Procurements")
-    products = fields.Many2many("emdad.line.procurement", string="Products")
+    products = fields.One2many("emdad.line.procurement", "related_tender",string="Products")
