@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+    <t t-name="emdad_procurement.ProcurementDashboard">
+    
+        <center style="padding-top:10px;">
+        <script src="https://cdn.lordicon.com/lordicon.js"></script>
+<lord-icon
+    src="https://cdn.lordicon.com/wyqtxzeh.json"
+    trigger="loop"
+    delay="2000"
+    colors="primary:#192435,secondary:#ef765a"
+    style="width:100px;height:100px">
+</lord-icon>
+            <strong><h1>Procurement Dashboard</h1></strong>
+        </center>
+        <div class="container" style="padding-top: 10px;">
+            <div class="row">
+                <div class="col stat-widget-one">
+                <center style="border: 1px solid black; padding-top: 10px; padding-bottom: 10px; background: #faf0e6;">
+                <h3><i class="fa fa-truck" aria-hidden="true"></i>
+                </h3>
+                    <h2>Direct Orders</h2>
+                    Orders made from vendors directly.
+                    <h1><div id="direct"></div></h1>
+                    <button class="btn btn-primary" t-on-click="openDirect">Create</button>
+                </center>
+                </div>
+                <div class="col stat-widget-one">
+                <center style="border: 1px solid black; padding-top: 10px; padding-bottom: 10px; background: #faf0e6;">
+                <h3><i class="fa fa-truck" aria-hidden="true"></i>
+                </h3>
+                    <h2>Emdad Market</h2>
+                    Orders made from vendors directly.
+                    <h1><div id="market"/></h1>
+                    <button class="btn btn-primary" t-on-click="openMarket">Create</button>
+                </center>
+                </div>
+                <div class="col stat-widget-one">
+                <center style="border: 1px solid black; padding-top: 10px; padding-bottom: 10px; background: #faf0e6;">
+                <h3><i class="fa fa-truck" aria-hidden="true"></i>
+                </h3>
+                    <h2>Tenders</h2>
+                    Orders made from vendors directly.
+                    <h1><div id="multiple"/></h1>
+                                        <button class="btn btn-primary" t-on-click="openTender">Create</button>
+
+                </center>
+                </div>
+            </div>
+        </div>
+    </t>
+    
+
+</templates>

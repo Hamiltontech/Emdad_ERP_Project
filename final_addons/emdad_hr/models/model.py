@@ -8,7 +8,7 @@ from emdad.exceptions import ValidationError
 
 class EmdadHR(models.Model):
     _name="emdad.hr"
-    _description = "HR----test"
+    _description = "HR Management"
 
     name = fields.Char(string="Employee Name",required=True)
     emp_id = fields.Integer(string="Employee ID")
@@ -124,6 +124,15 @@ class EmdadHRDepartment(models.Model):
     parent_department = fields.Many2one("emdad.hr.department", string="Parent Department")
     manager = fields.Many2one("emdad.hr", string="Manager")
     employees = fields.One2many("emdad.hr", "department", string="Employees")
+    number_of_employees = fields.Float(string="# of Employees", compute="_calculate_employees")
+
+    @api.depends('employees')
+    def _calculate_employees(self):
+        for record in self:
+            if record.employees:
+                record.number_of_employees = len(record.employees)
+            else:
+                record.number_of_employees = 0
 
 
 class EmdadHREducation(models.Model):
@@ -234,8 +243,8 @@ class EmdadHRContracts(models.Model):
     def _get_name(self):
         for record in self:
             if record.related_employee and record.job and record.start_date:
-                related_employee = str(record.related_employee.name)
-                job =str(record.job.name)
+                related_employee = str(record.related_employee.id)
+                job =str(record.job.id)
                 year = str(record.start_date.year)
                 month = str(record.start_date.month).zfill(2)
                 sequence = str(record.id).zfill(5)

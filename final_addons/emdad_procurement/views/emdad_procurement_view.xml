@@ -370,6 +370,11 @@
         <field name="view_mode">kanban,form</field>
         <field name="domain">[]</field>
     </record>
+<record model="ir.actions.client" id="dashboard">
+    <field name="name">Dashboard</field>
+    <field name="tag">emdad_procurement.dashboard</field>
+</record>
+
     <menuitem id="emdad_procurement_menu" name="Procurement"/>
     
     <menuitem id="emdad_procurement_orders_menu"
@@ -383,4 +388,10 @@
         action="emdad_tender_windows"
         parent="emdad_procurement_menu"
         sequence="3"/>
+        <menuitem
+            id="emdad_procurement_dashboard_menu"
+            name="Dashboard"
+            action="dashboard"
+            parent="emdad_procurement_menu"
+            sequence="1"/>
 </emdad>

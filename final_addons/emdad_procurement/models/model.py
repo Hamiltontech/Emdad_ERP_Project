@@ -41,6 +41,21 @@ class EmdadProcurement(models.Model):
     emdad_category = fields.Many2one("product.emdad.category", string="Category")
     related_tender = fields.Many2one("emdad.tender", string="Related Tender")
 
+    @api.model
+    def get_tiles_data(self):
+        procurements = self.search([])
+        procurements_by_process_type = procurements.mapped('process_type')
+
+        direct_count = procurements_by_process_type.count('direct')
+        market_count = procurements_by_process_type.count('market')
+        multiple_count = procurements_by_process_type.count('multiple')
+
+        return {
+            'direct_count': direct_count,
+            'market_count': market_count,
+            'multiple_count': multiple_count,
+        }
+
     @api.depends('vendors')
     def _number_vendors(self):
         for record in self:

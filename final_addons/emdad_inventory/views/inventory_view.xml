@@ -14,20 +14,62 @@
                     </div>
                     <group string="Warehouse Information">
                     <field name="short_name"/>
-                    <field name="warehouse_relation"/>
                     <field name="total_qty"/>
                     </group>
-                    <group string="Warehouse Locations">
+                    <notebook>
+                    <page string="Locations">
                         <field name="locations" widget="one2many_list">
-                            <tree editable="bottom">
-                                <field name="name"/>
-                                <field name="location_type"/>
-                                <field name="used_delivery"/>
-                                <field name="used_reciepts"/>
-                                <field name="location_usage"/>
-                            </tree>
-                        </field>
-                    </group>
+                             <kanban>
+                              <t t-name="kanban-box">
+                               <div t-attf-class="oe_kanban_global_click">
+                                <t t-name="kanban-box">
+                                <div t-attf-class="oe_kanban_global_click">
+                                    <div class="o_kanban_image">
+                                       <img src="https://cdn.iconscout.com/icon/free/png-512/free-boxes-3705907-3086161.png"/>
+                                    </div>
+                                    <div class="oe_kanban_details">
+                                        <strong class="o_kanban_record_title">
+                                        <field name="name"/>
+                                        <br></br>
+                                        </strong>
+                                    <div>
+                                    <i class="fa fa-eercast" aria-hidden="true"></i>
+                                     Type: <field name="location_type"/>
+                                     <br></br>
+                                     <i class="fa fa-th-large" aria-hidden="true"></i>
+                                      Quantity: <field name="quantity"/>                                     
+                                    </div>
+                                    <field name="used_delivery" invisible="1"/>
+                                    <field name="used_reciepts" invisible="1"/>
+                                    <div invisible="used_delivery != True">
+                                    <i class="fa fa-truck" aria-hidden="true"></i> Used for delivery
+                                    </div>
+                                    <div invisible="used_reciepts != True">
+                                    <i class="fa fa-truck" aria-hidden="true"></i> Used for reciepts
+                                    </div>
+                                   
+                                    </div>
+                                </div>
+              </t>
+                                </div>
+                                </t>
+                            </kanban>
+                            </field>
+                        </page>
+                        <page string="Configuration">
+                            <group>
+                                <group string="Address">
+                                    <field name="address"/>
+                                    <field name="city"/>
+                                    <field name="country"/>
+                                </group>
+                                <group string="Management">
+                                <field name="warehouse_manager"/>
+                                <field name="warehouse_relation"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
@@ -38,9 +80,33 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
-                    <group>
+                <div class="oe_title">
+                <h1>
                         <field name="name"/>
-                    </group>
+                        </h1>
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                        <center>
+                            <strong>Current Quantity</strong>
+                            <h2><field name="quantity"/></h2>
+                        </center>
+                        </div>
+                        <div class="col">
+                            <center>
+                            <strong>Location Usage</strong>
+                            <h2><field name="location_usage" readonly="1"/></h2>
+                        </center>
+                        </div>
+                        <div class="col">
+                        <center>
+                            <strong>Related Warehouse</strong>
+                            <h2><field name="related_warehouse" readonly="1"/></h2>
+                        </center>
+                        </div>
+                    </div>
+                </div>
                     <group string="Location Information">
                     <group>
                         <field name="related_warehouse"/>
@@ -56,8 +122,10 @@
         
                     </group>
                     </group>
-                    <field name="products" widget="one2many_list">
-                        <tree editable="bottom" group="product_id">
+                    <field name="products" widget="one2many_list" readonly="1">
+                        <tree group="product_id">
+                            <field name="related_adjustement"/>
+                            <field name="create_date"/>
                             <field name="product_id"/>
                             <field name="barcode"/>
                             <field name="expiary"/>
@@ -77,14 +145,30 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
-                    <group>
+                    <div class="oe_title">
+                    <h1>
                         <field name="name"/>
-                    </group>
+                    </h1>
+                    </div>
                     <group string="Adjustement Information">
                         <field name="adjustment_date"/>
                         <field name="purpose"/>
                         <field name="location"/>
+                        <field name="managed_by"/>
                     </group>
+                    <div class="container">
+                        <div class="row" style="padding: 10px">
+                        <div class="col" style="background: #faf0e6; padding: 10px;">
+                        <center>
+                        <img src="https://cdn.iconscout.com/icon/free/png-512/free-barcode-2162281-1817192.png" width="80px"/>
+                        <h3>Scan Product or Batch Barcode</h3>
+                            <h1>
+                                <field name="barcode" style="text-align: center;"/>
+                            </h1>
+                        </center>
+                        </div>
+                        </div>
+                    </div>
                     <field name="quants_lines" widget="one2many_list" context="{'default_location' : location}">
                                                 <tree editable="bottom">
 
@@ -195,57 +279,150 @@
     <field name="name">emdad_warehouse.view.kanban</field>
     <field name="model">emdad.warehouse</field>
     <field name="arch" type="xml">
-        <kanban class="o_res_partner_kanban">
-            <templates>
+        <kanban>
                 <t t-name="kanban-box">
-                    <div class="oe_kanban_global_click">
-                        <div class="oe_kanban_card">
-                            <div class="oe_kanban_image" t-attf-style="background-image: url('/web/image?model=emdad.warehouse&amp;field=image&amp;id=#{record.id}&amp;unique=1')">
+                    <div t-attf-class="oe_kanban_global_click">
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                               <img src="https://cdn.iconscout.com/icon/free/png-512/free-warehouse-1669075-1423600.png" width="150px"/>
                             </div>
                             <div class="oe_kanban_details">
-                                 <!-- <i class="fa fa-building fa-3x" style="color: #eeee; margin: auto;"></i> -->
-                                <strong class="oe_kanban_title"><field name="name"/></strong>
-                                <p><field name="short_name"/></p>
-                                <hr></hr>
-                                <feild name="locations_count"/> locations
-                                <p><field name="total_qty"/> Total Quantity</p>
+                                <strong class="o_kanban_record_title">
+                                <field name="name"/>
+                                </strong>
+                                <br></br>
+                                <i class="fa fa-thumb-tack" aria-hidden="true"></i>
+                                 Locations: <field name="locations_count"/>
+                                 <br></br>
+                                 <i class="fa fa-th-large" aria-hidden="true"></i>
+                                 Available: <field name="total_qty"/>
+                                 <br></br>
+                                 <i class="fa fa-map-marker" aria-hidden="true"></i>
+                                 Address: <field name="address"/>, <field name="city"/>, <field name="country"/>
                             </div>
                         </div>
+                    </t>
                     </div>
-                </t>
-            </templates>
-        </kanban>
+                    </t>
+            </kanban>
+    </field>
+</record>
+<record id="emdad_warehouse_location_view_kanban" model="ir.ui.view">
+    <field name="name">emdad_warehouse_location.view.kanban</field>
+    <field name="model">emdad.warehouse.location</field>
+    <field name="arch" type="xml">
+        <kanban>
+                <t t-name="kanban-box">
+                               <div t-attf-class="oe_kanban_global_click">
+                                <t t-name="kanban-box">
+                                <div t-attf-class="oe_kanban_global_click">
+                                    <div class="o_kanban_image">
+                                       <img src="https://cdn.iconscout.com/icon/free/png-512/free-boxes-3705907-3086161.png"/>
+                                    </div>
+                                    <div class="oe_kanban_details">
+                                        <strong class="o_kanban_record_title">
+                                        <field name="name"/>
+                                        <br></br>
+                                        </strong>
+                                    <div>
+                                    <i class="fa fa-eercast" aria-hidden="true"></i>
+                                     Type: <field name="location_type"/>
+                                     <br></br>
+                                     <i class="fa fa-th-large" aria-hidden="true"></i>
+                                      Quantity: <field name="quantity"/>                                     
+                                    </div>
+                                    <field name="used_delivery" invisible="1"/>
+                                    <field name="used_reciepts" invisible="1"/>
+                                    <div invisible="used_delivery != True">
+                                    <i class="fa fa-truck" aria-hidden="true"></i> Used for delivery
+                                    </div>
+                                    <div invisible="used_reciepts != True">
+                                    <i class="fa fa-truck" aria-hidden="true"></i> Used for reciepts
+                                    </div>
+                                   
+                                    </div>
+                                </div>
+              </t>
+                                </div>
+                                </t>
+            </kanban>
     </field>
 </record>
 <record id="emdad_warehouse_batches_view_kanban" model="ir.ui.view">
     <field name="name">emdad_warehouse_batches.view.kanban</field>
     <field name="model">emdad.warehouse.batches</field>
     <field name="arch" type="xml">
-        <kanban>
-            <templates>
+         <kanban>
                 <t t-name="kanban-box">
-                    <div class="oe_kanban_global_click">
-                        <div class="oe_kanban_card" style="text-align: center;">
-                            <div class="oe_kanban_details">
-                                <field name="status" widget="badge"/>
-                                <hr></hr>
-                                <h4><field name="name"/></h4>
-                                <hr></hr>
-                                <p>
-                                    Total Quantity : <field name="available"/>
-                                </p>
-                                <p>
-                                    Average Cost : <field name="average_cost"/>
-                                </p>
-                                <p>
-                                    Product : <field name="product_id"/>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </t>
-            </templates>
-        </kanban>
+                               <div t-attf-class="oe_kanban_global_click">
+                                <t t-name="kanban-box">
+                                <div t-attf-class="oe_kanban_global_click">
+                                    <div class="o_kanban_image">
+                                    <field name="status" invisible="1"/>
+                                       <img src="https://i.imgur.com/PtolqYe.png" invisible="status != 'active'"/>
+                                       <img src="https://i.imgur.com/PXQzwuT.png" invisible="status != 'almost'"/>
+                                       <img src="https://i.imgur.com/aCYIPAx.png" invisible="status != 'expired'"/>
+
+                                    </div>
+                                    <div class="oe_kanban_details">
+                                        <strong class="o_kanban_record_title">
+                                        <field name="name"/>
+                                        <br></br>
+                                        </strong>
+                                    <div>
+                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                     Expiary: <field name="expiary"/>
+                                     <br></br>
+                                     <i class="fa fa-th-large" aria-hidden="true"></i>
+                                      Product: <field name="product_id"/>
+                                      <br></br>
+                                      <i class="fa fa-archive" aria-hidden="true"></i>
+                                       Available Now: <field name="available"/>                                  
+                                    </div>
+                                   
+                                    </div>
+                                </div>
+              </t>
+                                </div>
+                                </t>
+            </kanban>
+    </field>
+</record>
+<record id="emdad_warehouse_quants_view_kanban" model="ir.ui.view">
+    <field name="name">emdad_warehouse_quants.view.kanban</field>
+    <field name="model">emdad.warehouse.quants</field>
+    <field name="arch" type="xml">
+       <kanban>
+                <t t-name="kanban-box">
+                               <div t-attf-class="oe_kanban_global_click">
+                                <t t-name="kanban-box">
+                                <div t-attf-class="oe_kanban_global_click">
+                                    <div class="o_kanban_image">
+                                       <img src="https://cdn.iconscout.com/icon/free/png-512/free-barcode-scanner-31-1183349.png"/>
+                                    </div>
+                                    <div class="oe_kanban_details">
+                                        <strong class="o_kanban_record_title">
+                                        <field name="name"/>
+                                        <br></br>
+                                        </strong>
+                                    <div>
+                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                     Date: <field name="adjustment_date"/>
+                                     <br></br>
+                                     <i class="fa fa-th-large" aria-hidden="true"></i>
+                                      Purpose: <field name="purpose"/>
+                                      <br></br>
+                                      <i class="fa fa-user" aria-hidden="true"></i>
+                                       Done By: <field name="managed_by"/>                                  
+                                    </div>
+                                   
+                                    </div>
+                                </div>
+              </t>
+                                </div>
+                                </t>
+            </kanban>
     </field>
 </record>
 
@@ -262,24 +439,29 @@
         <field name="res_model">emdad.warehouse.location</field>
         <field name="view_mode">kanban,form</field>
         <field name="domain">[]</field>
+        <field name="context">{'group_by': 'related_warehouse'}</field>
     </record>
     <record model="ir.actions.act_window" id="quants_emdad_windows">
         <field name="name">Quantities Management</field>
         <field name="res_model">emdad.warehouse.quants</field>
         <field name="view_mode">kanban,form</field>
         <field name="domain">[]</field>
+                <field name="context">{'group_by': 'purpose'}</field>
     </record>
      <record model="ir.actions.act_window" id="warehouse_quantities_windows">
-        <field name="name">Products Quantities</field>
+        <field name="name">Quantities History</field>
         <field name="res_model">emdad.warehouse.quants.lines</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[]</field>
+                        <field name="context">{'group_by': 'product_id'}</field>
+
     </record>    
     <record model="ir.actions.act_window" id="batches_management_windows">
         <field name="name">Batches Management</field>
         <field name="res_model">emdad.warehouse.batches</field>
         <field name="view_mode">kanban,form</field>
         <field name="domain">[]</field>
+                                <field name="context">{'group_by': 'status'}</field>
     </record>
     <record model="ir.actions.act_window" id="scrap_actions_windows">
         <field name="name">Scrap Actions</field>

@@ -1,5 +1,6 @@
 from emdad import fields, api, models
 from datetime import datetime, timedelta
+from emdad.exceptions import ValidationError
 
 class EmdadWarehouse(models.Model):
     _name = 'emdad.warehouse'
@@ -7,9 +8,13 @@ class EmdadWarehouse(models.Model):
     name = fields.Char(string="Warehouse Name")
     short_name = fields.Char(string="Short Name", unique=True)
     warehouse_relation = fields.Many2one("res.company", string="Related Company")
+    address = fields.Char(string="Address")
+    city = fields.Many2one("res.country.state", string="City")
+    country = fields.Many2one("res.country")
     locations = fields.One2many("emdad.warehouse.location", "related_warehouse", String="Locations")
     locations_count = fields.Integer(string="Number of Locations", compute="_number_locations", store=True)
     total_qty = fields.Float(string="Total Quantity", compute="_total_quantities")
+    warehouse_manager = fields.Many2one("emdad.hr", string="Warehouse Manager")
     @api.depends('locations')
     def _total_quantities(self):
         for record in self:
@@ -50,7 +55,35 @@ class EmdadQuants(models.Model):
     adjustment_date = fields.Date(string="Date of Adjustment")
     purpose = fields.Selection([('correction', 'Correction'), ('normal', 'Normal Adjustement'), ('purchase','Purchase'), ('delivery','Delivery')], string="Adjustment Purpose")
     location = fields.Many2one("emdad.warehouse.location", string="Adjustment Location")
+    managed_by = fields.Many2one("emdad.hr", string="Managed By")
+    barcode = fields.Char(string="Barcode")
     quants_lines = fields.One2many("emdad.warehouse.quants.lines", "related_adjustement", string="Lines")
+
+    @api.onchange('barcode')
+    def onchange_barcode(self):
+        if self.barcode:
+            product = self.env['product.management'].search([('barcode', '=', self.barcode)], limit=1)
+            
+            if not product:
+                batch_product = self.env['emdad.warehouse.batches'].search([('name', '=', self.barcode)], limit=1)
+                
+                if batch_product:
+                    self.quants_lines = [(0, 0, {
+                        'product_id': batch_product.product_id.id,
+                        'batch' : batch_product.id,
+                        'counted_qty': 1,
+                    })]
+                else:
+                    raise ValidationError("Batch Not Found, Input it manually below")
+            elif product:
+                self.quants_lines = [(0, 0, {
+                    'product_id': product.id,
+                    'counted_qty': 1,
+                })]
+            else: 
+                    raise ValidationError("Product Not Found, Input it manually below")
+        
+        self.barcode = ""
 
 class EmdadBatches(models.Model):
     _name= 'emdad.warehouse.batches'
@@ -97,7 +130,7 @@ class EmdadQuantsLines(models.Model):
     name = fields.Char(string="Line Relation")
     product_id = fields.Many2one("product.management", string="Product")
     barcode = fields.Char(string="Barcode", related="product_id.barcode")
-    expiary = fields.Date(string="Expiary Date")
+    expiary = fields.Date(string="Expiary Date", related="batch.expiary")
     location = fields.Many2one("emdad.warehouse.location", string="Location")
     counted_qty = fields.Float(string="Counted")
     metric = fields.Many2one("product.units", string="Unit")

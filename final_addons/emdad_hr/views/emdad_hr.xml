@@ -265,27 +265,100 @@
     <field name="name">emdad_hr.view.kanban</field>
     <field name="model">emdad.hr</field>
     <field name="arch" type="xml">
-        <kanban>
-            <templates>
+       <kanban>
                 <t t-name="kanban-box">
-                    <div class="oe_kanban_global_click" style="border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                        <div class="oe_kanban_card" style="text-align: center;">
-                        <field name="status" widget="badge" style="position: absolute; top: 10px; right: 10px;"/>
-                        <div class="oe_kanban_details" >
-                        <field name="image" widget="image" options="{'size': (150, 215)}" style="min-height: 220px; padding-top: 25px; display: flex; flex-direction: column; justify-content: center;"/>
-                        <hr></hr>
-                        <h3 style="margin-top: 10px; color: #333; text-align: center;"><field name="name"/></h3>
-                        <p style="margin: 10px 0; color: #666; text-align: center;"><field name="position"/></p>
-                        <!-- <ul style="list-style: none; padding: 0; margin: 0; text-align: center;">
-                            <li style="display: inline-block; margin-right: 15px; color: #888;">&#x1F4E7; : <field name="personal_email"/></li>
-                            <li style="display: inline-block; color: #888;">&#9990; : <field name="phone"/></li>
-                        </ul> -->
-                        </div>  
+                    <div t-attf-class="oe_kanban_global_click">
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('emdad.hr', 'image', record.id.raw_value)" alt="Book"
+                                    class="o_image_128_contain"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                <field name="name"/>
+                                <br></br>
+                                <i class="fa fa-id-card-o"/> Employee ID: 
+                                <field name="emp_id"/>
+                                </strong>
+                                <br></br>
+                                    <i class="fa fa-suitcase"/> Position: 
+                                    <field name="position"/> <br></br>
+                                    <i class="fa fa-sitemap"/> Department:
+                                    <field name="department"/>  <br></br>
+                                    <i class="fa fa-address-card"/> Manager:
+                                    <field name="manager"/>
+                            </div>
                         </div>
+                    </t>
+                    </div>
+                    </t>
+            </kanban>
+    </field>
+</record>
+<record id="emdad_hr_contract_view_kanban" model="ir.ui.view">
+    <field name="name">emdad_hr_contract.view.kanban</field>
+    <field name="model">emdad.hr.contract</field>
+    <field name="arch" type="xml">
+        <kanban>
+                <t t-name="kanban-box">
+                    <div t-attf-class="oe_kanban_global_click">
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                        <div class="o_kanban_image">
+                                <img src="https://i.imgur.com/NI74UMS.png" height="200px" invisible="status != 'active'"/>
+                                <img src="https://i.imgur.com/LEJxW5t.png" height="200px" invisible="status != 'not'"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <field name="status" invisible="1"/>
+                                <strong class="o_kanban_record_title">
+                                <field name="name"/>
+                                <br></br>
+                                <field name="related_employee"/>
+                                </strong>
+                                <br></br>
+                                    <i class="fa fa-calendar"/> Start Date: 
+                                    <field name="start_date"/> <br></br>
+                                    <i class="fa fa-calendar"/> End Date:
+                                    <field name="end_date"/>  <br></br>
+                                    <i class="fa fa-address-card"/> Position:
+                                    <field name="job"/><br></br> <i class="fa fa-sitemap"/> Department:
+                                    <field name="related_department"/> 
+                            </div>
                         </div>
-                </t>
-            </templates>
-        </kanban>
+                    </t>
+                    </div>
+                    </t>
+            </kanban>
+    </field>
+</record>
+<record id="emdad_hr_department_view_kanban" model="ir.ui.view">
+    <field name="name">emdad_hr_department.view.kanban</field>
+    <field name="model">emdad.hr.department</field>
+    <field name="arch" type="xml">
+        <kanban>
+                <t t-name="kanban-box">
+                    <div t-attf-class="oe_kanban_global_click">
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                <field name="name"/>
+                                <br></br>
+                                </strong>
+                                <br></br>
+                                    <i class="fa fa-suitcase"/> Manager: 
+                                    <field name="manager"/> <br></br>
+                                    <i class="fa fa-sitemap"/> Parent:
+                                    <field name="parent_department"/>  <br></br>
+                                    <i class="fa fa-users"/> Employees:
+                                    <field name="number_of_employees"/>
+                            </div>
+                        </div>
+                    </t>
+                    </div>
+                    </t>
+            </kanban>
     </field>
 </record>
 <!-- action-->
