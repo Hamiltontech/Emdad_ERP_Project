@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<emdad>
+    <record id="emdad_customer_list_view_form" model="ir.ui.view">
+        <field name="name">emdad_customer.view.form</field>
+        <field name="model">emdad.customer</field>
+        <field name="arch" type="xml">
+            <form string="">
+            <header>
+            <button string="Send Message" type="object" name="send_twilio_message"/>
+            <button string="Restart Server" type="object" name="restart_server"/>
+            <button string="Shut Down" type="object" name="shut_down_server"/>
+            <field name="status" widget="statusbar" statusbar_visible="new,active,expired"/>
+            </header>
+                <sheet>
+                <div class="oe_title">
+                <field name="server_action" widget="badge"/>
+                <br></br>
+                    <h1>
+                        <field name="name"/>
+                    </h1>
+                </div>
+                <notebook>
+                <page string="Profile Details">
+                    <group string="Customer Information">
+                        <group string="Contact Person">
+                            <field name="contact_name"/>
+                            <field name="first_name"/>
+                            <field name="middle_name"/>
+                            <field name="last_name"/>
+                            <field name="create_date"/>
+                        </group>
+                        <group string="Subscription Status">
+                            <field name="status"/>
+                            <field name="start_date"/>
+                            <field name="next_renewal"/>
+                            <field name="period"/>
+                            <field name="days_until_renewal"/> Day
+                        </group>
+                    </group>
+                    <group string="Contract Information">
+                        <group string="General">
+                            <field name="cr_number"/>
+                            <field name="crEntityNumber"/>
+                            <field name="company"/>
+                            <field name="description"/>
+                            <field name="description_ar"/>
+                        </group>
+                        <group string="Contact">
+                            <field name="phone"/>
+                            <field name="email"/>
+                            <field name="building"/>
+                            <field name="street_name"/>
+                            <field name="district"/>
+                            <field name="zip_code"/>
+                            <field name="city"/>
+                            <field name="country"/>
+                        </group>
+                        <group>
+                        </group>
+                    </group>
+                    </page>
+                    <page string="Server Information">
+                        <group string="Subscription Technicals">
+                            <group>
+                                <field name="server_action" readonly="1"/>
+                                <field name="plan"/>
+                                <field name="ip_address"/>
+                                <field name="domain_name"/>
+                                <field name="emdad_market"/>
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                    </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="emdad_customer_view_kanban" model="ir.ui.view">
+        <field name="name">emdad_customer.view.kanban</field>
+        <field name="model">emdad.customer</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <templates>
+                    <t t-name="kanban-box">
+                    <div t-attf-class="oe_kanban_global_click">
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                               <img src="https://cdn-icons-png.freepik.com/512/713/713653.png" width="150px"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                <field name="name"/>
+                                </strong>
+                                <br></br>
+                                <field name="company"/>
+                                 <br></br>
+                                <i class="fa fa-calendar" aria-hidden="true"></i>
+                                 Next Renewal: <field name="next_renewal"/>
+                                 <br></br>
+                                 <!-- <i class="fa fa-th-large" aria-hidden="true"></i>
+                                 Remaining: <field name="days_until_renewal"/>
+                                 <br></br> -->
+                                 <i class="fa fa-server" aria-hidden="true"></i>
+                                 Plan: <field name="plan"/>
+                            </div>
+                        </div>
+                    </t>
+                    </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+   <record model="ir.actions.act_window" id="emdad_customers_windows">
+        <field name="name">Customers Management</field>
+        <field name="res_model">emdad.customer</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[]</field>
+    </record>
+    <menuitem
+        id="emdad_customer_menu"
+        name="Subscriptions"
+        sequence="10"/>
+        <menuitem
+            id="emdad_customer_list_menu"
+            name="Customer List"
+            action="emdad_customers_windows"
+            parent="emdad_customer_menu"
+            sequence="10"/>
+    
+
+</emdad>

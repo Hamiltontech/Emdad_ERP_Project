@@ -2,3 +2,4 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_emdad_procurement_internal,user_group_internal,model_emdad_procurement,base.group_user,1,1,1,1
 access_emdad_line_procurement_internal,user_group_internal,model_emdad_line_procurement,base.group_user,1,1,1,1
 access_emdad_tender_internal,user_group_internal,model_emdad_tender,base.group_user,1,1,1,1
+access_emdad_tender_vendor,user_group_internal,model_emdad_tender_vendor,base.group_user,1,1,1,1

@@ -446,3 +446,39 @@ class EmdadTender(models.Model):
     terms = fields.Html(string="Terms")
     procurements = fields.One2many("emdad.procurement", "related_tender", string="Procurements")
     products = fields.One2many("emdad.line.procurement", "related_tender",string="Products")
+    vendors_list = fields.One2many("emdad.tender.vendor", "related_tender", string="Vendors List")
+
+    def approve_tender(self):
+        for record in self:
+            record.status = 'rfp'
+    
+class EmdadTenderVendors(models.Model):
+    _name="emdad.tender.vendor"
+
+    name = fields.Char(string="Related Tender")
+    related_tender = fields.Many2one("emdad.tender", string="Related Tender")
+    vendor = fields.Many2one("emdad.contacts", string="Vendor")
+    history_purchase = fields.Integer(string="History Purchase", related="vendor.procurement_transactions")
+    vendor_category = fields.Many2one("product.emdad.category", string="Vendor Category")
+    application_id = fields.Char(string="Application ID", compute="_create_application_id")
+    offer = fields.Binary(string="Offer PDF")
+    comments = fields.Text(string="Comments")
+    apply_date = fields.Date(string="Apply Date")
+
+    @api.onchange('related_tender')
+    def _create_application_id(self):
+        for record in self:
+            if record.related_tender:
+                tender = str(record.related_tender.name)
+                app_id = str(record.id)
+                record.application_id = 'TNDR' + tender + app_id
+            else:
+                record.application_id = 'Not Defiend'
+    @api.onchange('vendor')
+    def assign_vendor_category(self):
+        for record in self:
+            if record.vendor:
+                record.vendor_category = record.vendor.category.id
+            else:
+                pass
+    
