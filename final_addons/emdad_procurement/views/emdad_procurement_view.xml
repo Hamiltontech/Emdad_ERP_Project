@@ -13,6 +13,7 @@
             <button string="Create Quantities" type="object" name="create_inventory_input" invisible = " status != 'recieve'"/>
             <button string="Create Bill" type="object" name="create_bill_je" invisible="bill_status == 'created'"/>
             <button string="Create Payment" type="object" name="create_payment" invisible="payment_status == 'paid'"/>
+            <button string="Print Bill" type="object" name="print_vendor_bill"/>
             <field name="status" widget="statusbar" statusbar_visible="pending,active,closed,expired,recieve" />
         </header>
             <sheet>
@@ -352,7 +353,6 @@
     <field name="name">Dashboard</field>
     <field name="tag">emdad_procurement.dashboard</field>
 </record>
-
     <menuitem id="emdad_procurement_menu" name="Procurement"/>
     
     <menuitem id="emdad_procurement_orders_menu"

@@ -18,10 +18,10 @@
     <field name="model">product.management</field>
     <field name="inherit_id" ref="products_management.view_products_management_form"/>
     <field name="arch" type="xml">
-        <xpath expr="//field[@name='related_company']" position="before">
+        <field name="description" position="after">
             <field name="sales_tax" domain="[('scope', '=', 'sales')]"/>
             <field name="purchase_tax" domain="[('scope', '=', 'purchases')]"/>
-        </xpath>
+        </field>
     </field>
    </record>
 </emdad>

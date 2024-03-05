@@ -41,6 +41,15 @@ class EmdadProcurement(models.Model):
     emdad_category = fields.Many2one("product.emdad.category", string="Category")
     related_tender = fields.Many2one("emdad.tender", string="Related Tender")
 
+    def print_vendor_bill(self):
+        datas = self.env[self._name].browse(self.ids).read()[0]
+        report_action = self.env.ref('emdad_procurement.emdad_procurement_report_action')
+        if report_action:
+            return report_action.report_action(self.ids, data=datas)
+        else:
+            return {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'title': 'Error', 'message': 'Report action not found'}}
+
+
     @api.model
     def get_tiles_data(self):
         procurements = self.search([])

@@ -10,6 +10,8 @@ Send KPI Digests periodically
     'data': [
         'security/ir.model.access.csv',
         'views/emdad_procurement_view.xml',
+        'report/report_emdad_procurement_template.xml',
+        'report/vendor_bill.xml'
     ],
     'installable': True,
     'license': 'LGPL-3',

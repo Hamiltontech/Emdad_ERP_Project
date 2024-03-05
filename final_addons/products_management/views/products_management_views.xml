@@ -5,6 +5,10 @@
         <field name="model">product.management</field>
         <field name="arch" type="xml">
             <form class="o_sale_order">
+            <header>
+                <button string="Deactivate Product" name="deactivate_product" type="object" invisible="active_product != True"/>
+                <button string="Activate Product" name="activate_product" type="object" invisible="active_product != False"/>
+            </header>
             <sheet>
             <field name="product_image" widget='image' class="oe_left oe_avatar"/>
             <div class="oe_title">
@@ -47,48 +51,105 @@
                     <field name="barcode" required="1"/>
                     <field name="emdad_reference" required="1"/>
                     <field name="selling_price" required="1"/>
-                    <field name="is_expiary" required="1"/>
+                    <!-- <field name="is_expiary" required="1"/>
                     <field name="is_kit" required="1"/>
                     <field name="category" required="1"/>
                     <field name="active_product" required="1"/>
                     <field name="product_origin" required="1"/>
-                    <field name="quants"/>
+                    <field name="quants"/> -->
                 </group>
                 <group name="other_information" string="Product Relations">
-                        <field name="product_image"/>
+                        <!-- <field name="product_image"/> -->
                         <field name="description" required="1"/>
-                        <field name="selling_metric" domain="[('metric', '=', related_metric)]" required="1"/>
+                        <!-- <field name="selling_metric" domain="[('metric', '=', related_metric)]" required="1"/>
                         <field name="purchase_metric" domain="[('metric', '=', related_metric)]" required="1"/>
                         <field name="related_metric"/>
-                        <field name="related_company" widget="many2many_tags" required="1"/>                    
+                        <field name="related_company" widget="many2many_tags" required="1"/>                     -->
                 </group>
                 
             </group>
             <notebook>
                 <page name="pricing" string="Product Pricing">
                     <field name="products_pricing" widget="one2many_list" context="{'default_related_product': id}" required="1">
-                        <tree editable="bottom">
-                            <field name="related_product" optional="hidden" required="1"/>
-                            <field name="name" required="1"/>
-                            <field name="min_qty" required="1"/>
-                            <field name="max_qty" required="1"/>
-                            <field name="related_unit" required="1"/>
-                            <field name="start_date" required="1"/>
-                            <field name="end_date" required="1"/>
-                            <field name="price" required="1"/>
-                            <field name="status" widget="badge" required="1"/>
-                        </tree>
+                              <kanban>
+                              <t t-name="kanban-box">
+                               <div t-attf-class="oe_kanban_global_click">
+                      <div class="o_kanban_image">
+                          <img src="https://cdn2.iconfinder.com/data/icons/shopping-299/128/Price-Tag-Product-Cost-512.png" width="100px"/>
+                      </div>
+                      <div class="oe_kanban_details">
+                        <field name="status" widget="badge"/><br></br>
+                          <strong class="o_kanban_record_title">
+                          <field name="name"/>
+                          </strong>
+                          <br></br>
+                           <field name="min_qty"/> <field name="related_unit"/> to <field name="max_qty"/> <field name="related_unit"/>
+                           <br></br>
+                            From <field name="start_date"/> till <field name="end_date"/>
+                            <br></br>
+                            Assigned Price : <field name="price"/> SAR
+                      </div>
+                      </div>   
+                    </t>
+                    </kanban>
                     </field>
                 </page>
-                <!-- <page name="contains" string="Components" invisible="'is_kit' != True">
-                <field name="contains"/>
-                </page> -->
+                <page string="Product Information">
+                <group>
+                 <group name="product_fixed_info" string="Products Reference">
+                    <field name="is_expiary" required="1"/>
+                    <field name="is_kit" required="1"/>
+                    <field name="category" required="1"/>
+                    <field name="active_product" required="1" invisible="1"/>
+                    <field name="product_origin" required="1"/>
+                    <field name="quants"/>
+                </group>
+                <group name="other_information" string="Product Relations">
+                        <field name="selling_metric" domain="[('metric', '=', related_metric)]" required="1"/>
+                        <field name="purchase_metric" domain="[('metric', '=', related_metric)]" required="1"/>
+                        <field name="related_metric"/>
+                </group>
+                </group>
+                </page>
+
             </notebook>
                     
                     </sheet>
             </form>
         </field>
     </record> 
+    <record id="emdad_procurement_pricing_view_form" model="ir.ui.view">
+        <field name="name">emdad_procurement_pricing.view.form</field>
+        <field name="model">emdad.products.pricing</field>
+        <field name="arch" type="xml">
+            <form string="">
+            
+                <sheet>
+                <h1>
+                    <div class="oe_title">
+                        <field name="name"/>
+                    </div>
+                </h1>
+                    <group string="Pricing Information">
+                        <group>
+                            <field name="related_product" readonly="1"/>
+                            <field name="min_qty"/>
+                            <field name="max_qty"/>
+                            <field name="related_unit" domain="[('metric', '=', metric)]"/>
+                            <field name="metric" readonly="1"/>
+                            <field name="status" widget="badge"/>
+                        </group>
+                        <group>
+                            <field name="price"/>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                        </group>
+                        
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
      <record model="ir.actions.act_window" id="products_management_windows">
     <field name="name">Products Management</field>
     <field name="res_model">product.management</field>

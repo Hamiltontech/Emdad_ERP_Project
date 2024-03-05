@@ -27,6 +27,12 @@ class ProductManagement(models.Model):
     quants = fields.Float(compute='get_total_counted_qty',string="quantity")
     total_sales_count = fields.Integer(compute='_compute_total_sales_count',string="Total sales count")
     total_procurement_count = fields.Integer(compute='_compute_total_procurement_count',string="total procurement count")
+    def activate_product(self):
+        for record in self:
+            record.active_product = True
+    def deactivate_product(self):
+        for record in self:
+            record.active_product = False
     @api.onchange('products_pricing')
     def _calculate_average(self):
         for record in self:
@@ -158,6 +164,7 @@ class ProductsPricing(models.Model):
     active = fields.Boolean(string="Active")
     related_unit = fields.Many2one("product.units", string="Unit Metric")
     status = fields.Selection([('not','Expired'), ('active','Active')], string="Status")
+    metric = fields.Many2one("product.metrics", related="related_product.related_metric", string="Related Metric")
 
     @api.onchange('min_qty', 'max_qty')
     def _compare_qty(self):
