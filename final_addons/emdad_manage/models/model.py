@@ -6,7 +6,7 @@ from twilio.rest import Client
 class EmdadCustomer(models.Model):
     _name="emdad.customer"
 
-    name = fields.Char(string="Customer ID")
+    name = fields.Char(string="Customer ID", compute="_compute_subscription_id")
     contact_name = fields.Char(string="Contact Name", compute="_make_name")
     first_name = fields.Char(string="First Name")
     middle_name = fields.Char(string="Second Name")
@@ -14,13 +14,11 @@ class EmdadCustomer(models.Model):
     status = fields.Selection([('new','New'),('active','In Progress'), ('expired','Expired')], string="Status", compute="_calculate_status")
     start_date = fields.Date(string="Start Date")
     next_renewal = fields.Date(string="Next Renewal")
-    period = fields.Float(string="Subscription Months", compute="_calculate_months")
+    period = fields.Float(string="Remaining Months", compute="_calculate_months")
     days_until_renewal = fields.Float(string="Remaining Days", compute="_calculate_days_until_renewal")
-    #server_information
     plan = fields.Selection([('nano','Emdad Nano'),('micro','Emdad Micro'),('custom','Emdad Pro')], string="Assigned Plan")
     ip_address = fields.Char(string="IP Address")
     domain_name = fields.Char(string="Domain Name")
-    #company
     company = fields.Char(string="Company Name")
     cr_number = fields.Char(string="Company CR")
     street_name = fields.Char(string="Street")
@@ -36,6 +34,30 @@ class EmdadCustomer(models.Model):
     country = fields.Many2one("res.country", string="Country")
     emdad_market = fields.Boolean(string="Has Emdad Market")
     server_action = fields.Selection([('running','Running'), ('restarting','Restarting'), ('down','Down')], string="Server Action", default="running")
+    tickets = fields.One2many("emdad.support", "related_subscription", string="Tickets")
+    status_char = fields.Char(string="Status (Char)", compute="_compute_status_char", store=True, readonly=True)
+
+    @api.depends("status")
+    def _compute_status_char(self):
+        for record in self:
+            record.status_char = dict(record._fields["status"].selection).get(record.status, "")
+
+    @api.depends('start_date')
+    def _compute_subscription_id(self):
+        for record in self:
+            if record.id:
+                year_month = record.start_date.strftime('%Y%m') if record.start_date else '000000'
+                subscription_id = f"EMDAD{year_month}{record.id}"
+                record.name = subscription_id
+    @api.depends('next_renewal')    
+    def _calculate_days_until_renewal(self):
+        for record in self:
+            if record.next_renewal:
+                today = datetime.now().date()
+                remaining_days = (record.next_renewal - today).days
+                record.days_until_renewal = remaining_days
+            else:
+                record.days_until_renewal = 0.0
 
     def shut_down_server(self):
         for record in self:
@@ -118,33 +140,45 @@ class EmdadCustomer(models.Model):
             else:
                 record.status = 'new'
 
-    @api.depends('next_renewal')
-    def _calculate_days_until_renewal(self):
+class EmdadSupport(models.Model):
+    _name="emdad.support"
+    
+    name = fields.Char(string="Name", compute="_ticket_id")
+    type = fields.Selection([('technical','Technical'), ('billing','Billing'), ('general','General')], string="Ticket Type")
+    medium = fields.Selection([('email','Email'), ('phone','Phone'), ('inspection','Inspection')], string="Ticket Medium")
+    related_to = fields.Selection([('aws','Amazon Web Services'), ('system','System')])
+    subject = fields.Char(string="Subject")
+    issue = fields.Text(string="Issue Explained")
+    status = fields.Selection([('new','New'), ('progress','Progress'), ('solved','Solved'), ('cancel','Cancel')], string="Status", default="new")
+    assigned_to = fields.Many2one("emdad.hr", string="Assigned Employee")
+    related_subscription = fields.Many2one("emdad.customer", string="Subscription")
+    contact_name = fields.Char(string="Contact Name", related="related_subscription.contact_name")
+    contact_email = fields.Char(string="Contact Email", related="related_subscription.email")
+    contact_phone = fields.Char(string="Contact Phone", related="related_subscription.phone")
+    sub_status = fields.Selection([('new','New'),('active','In Progress'), ('expired','Expired')], string="Status", related="related_subscription.status")
+    start_date = fields.Datetime(string="Started On")
+    finish_date = fields.Datetime(string="Finished On")
+    status_char = fields.Char(string="Status (Char)", compute="_compute_status_char", store=True, readonly=True)
+
+    @api.depends("status")
+    def _compute_status_char(self):
         for record in self:
-            if record.next_renewal:
-                today = datetime.now().date()
-                remaining_days = (record.next_renewal - today).days
-                record.days_until_renewal = remaining_days
+            record.status_char = dict(record._fields["status"].selection).get(record.status, "")
 
-                # Check if 10 days remaining or subscription expired
-                if remaining_days == 10:
-                    record.send_twilio_message("Your subscription will expire in 10 days.")
-                elif remaining_days < 0:
-                    record.send_twilio_message("Your subscription has expired.")
-
-    def send_twilio_message(self, message):
-        # Your Twilio Account SID, Auth Token, and Twilio phone number
-        account_sid = "AC7f8f523885e4938a73936ce0f5b498d8"
-        auth_token = "94c68fb4dcae33a87edd29107e3c3c4c"
-        twilio_phone_number = "+18582603816"
-
-        to_phone_number = self.phone
-
-        client = Client(account_sid, auth_token)
-
-        # Send SMS using Twilio
-        message = client.messages.create(
-            body=message,
-            from_=twilio_phone_number,
-            to=to_phone_number
-        )
+    def close_ticket(self):
+        for record in self:
+            record.status = 'solved'
+            record.finish_date = fields.Datetime.now()
+    def start_ticket(self):
+        for record in self:
+            record.status = 'progress'
+            record.start_date = fields.Datetime.now()
+    @api.depends('related_subscription', 'create_date')
+    def _ticket_id(self):
+        for record in self:
+            if record.related_subscription and record.create_date:
+                subscription_id = record.related_subscription.id
+                ticket_id = f"ISSUE{subscription_id}{record.id}"
+                record.name = ticket_id
+            else:
+                record.name = 'NOT DEFINED'

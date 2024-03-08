@@ -194,7 +194,42 @@
             </kanban>
         </field>
     </record>
-
+    <record id="emdad_sales_line_view_form" model="ir.ui.view">
+        <field name="name">emdad_sales_line.view.form</field>
+        <field name="model">emdad.sales.line</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                <field name="product_image" widget="image" class="oe_left oe_avatar"/>
+                    <group>
+                        <group string="Basic Information">
+                            <field name="product_id"/>
+                            <field name="barcode"/>
+                            <field name="description"/>         
+                        </group>
+                        <group string="Request Information">
+                            <field name="request_qty" string="Requested Quantity"/>
+                            <field name="attach"/>
+                            <field name="delivery_type"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Financial Information">
+                            <field name="price_list" domain="[('related_product', '=', product_id)]"/>
+                            <field name="discount"/>
+                            <field name="tax" domain="[('scope', '=', 'sales')]"/>
+                            <field name="total"/>
+                            <field name="final_total"/>
+                        </group>
+                        <group string="Delivery Information">
+                            <field name="recieved_qty"/>
+                            <field name="sent_status"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
     <record model="ir.actions.act_window" id="emdad_sales_windows">
         <field name="name">Sales Management</field>
         <field name="res_model">emdad.sales</field>

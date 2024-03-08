@@ -8,7 +8,7 @@
     'license': 'LGPL-3',
     'category': '',
     'depends': [
-        'base'
+        'base', 'emdad_hr'
     ],
     'data': [
         'views/emdad_manage.xml',

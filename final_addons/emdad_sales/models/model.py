@@ -111,6 +111,7 @@ class EmdadSalesLines(models.Model):
     barcode = fields.Char(string="Barcode", related="product_id.barcode")
     attach = fields.Binary(string="Specifications")
     request_qty = fields.Float(string="Quantity")
+    price_list = fields.Many2one("emdad.products.pricing", string="Price List")
 
     @api.depends('recieved_qty')
     def _get_status(self):
