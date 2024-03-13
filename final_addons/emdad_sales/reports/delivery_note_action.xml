@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<emdad>
+    <record id="action_report_delivery_note" model="ir.actions.report">
+   <field name="name">Delivery Note</field>
+   <field name="model">emdad.sales</field>
+   <field name="report_type">qweb-pdf</field>
+   <field name="report_name">emdad_sales.delivery_note</field>
+   <field name="report_file">emdad_sales.delivery_note</field>
+   <field name="binding_model_id" ref="emdad_sales.model_emdad_sales"/>
+   <field name="binding_type">report</field>
+</record>
+</emdad>

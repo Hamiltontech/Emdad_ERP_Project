@@ -14,6 +14,7 @@
             <button string="Create Bill" type="object" name="create_bill_je" invisible="bill_status == 'created'"/>
             <button string="Create Payment" type="object" name="create_payment" invisible="payment_status == 'paid'"/>
             <button string="Print Bill" type="object" name="print_vendor_bill"/>
+            <button string="Create Counter Offer" type="object" name="create_counter_offer" class="btn-warning" invisible="direct_type == 'direct'"/>
             <field name="status" widget="statusbar" statusbar_visible="pending,active,closed,expired,recieve" />
         </header>
             <sheet>
@@ -31,6 +32,8 @@
                 <field name="exp_quote"/>
                 <field name="operation_type"/>
                 <field name="process_type"/>
+                <field name="direct_type" invisible="process_type != 'direct'"/>
+                <field name="parent_rfq" invisible="process_type != 'direct'"/>
                 <field name="payment_type"/>
                 <field name="distribution_type"/>
                 <field name="single_location" invisible = "distribution_type != 'single'" domain="[('used_reciepts', '=', True)]"/>
@@ -44,7 +47,6 @@
                 </group>
                  <group>
                 <field name="vendor" domain="[('contact_type', '=', 'vendor')]" invisible = "process_type != 'direct'"/>
-                <field name="vendors" domain="[('contact_type', '=', 'vendor')]" invisible = "process_type != 'multiple'" widget="many2many_tags"/>
                 <field name="vendor_phone" widget="phone" invisible = "process_type != 'direct'"/>
                 <field name="credit_facility"/>
                 <field name="credit_balance"/>
@@ -158,6 +160,10 @@
                         </field>
                         
                     </page>
+                    <page name="related" string="Counter Offers" invisible="direct_type == 'direct'">
+                        <field name="related_offers"/>
+                        
+                    </page>
                 </notebook>
            </group>
             </sheet>
@@ -180,7 +186,10 @@
                     </group>
                     <group string="Request Details">
                         <field name="packaging"/>
-                        <field name="request_qty"/>
+                        <field name="is_packge" invisible="1"/>
+                        <field name="package_qty" invisible="is_packge == False"/>
+                        <field name="request_qty" readonly="is_packge == True"/>
+                        <field name="total_quantity" invisible="is_packge == False"/>
                         <field name="metric" domain="[('metric', '=', related_metric)]"/>
                         <field name="related_metric" optional="hide"/>
                     </group>
@@ -267,10 +276,6 @@
                                             </div>
                                              <div invisible="process_type != 'direct'">
                                             <field name="vendor" widget="badge"/>
-                                            </div>
-                                            <div invisible="process_type != 'multiple'">
-                                            <i class="fa fa fa-bandcamp"/> Assigned 
-                                            <field name="number_vendors"/> Vendors
                                             </div>
                                             <br></br>
                                             

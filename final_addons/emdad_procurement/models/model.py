@@ -7,12 +7,13 @@ class EmdadProcurement(models.Model):
 
     name = fields.Char(string="Procurement ID",compute="_get_name")
     effective_date = fields.Date(string="Effective Date")
+    parent_rfq = fields.Many2one("emdad.procurement", string="Parent Offer")
     operation_type = fields.Selection([('resupply', 'Resupply'), ('replinish', 'Replinishement')], string="Procurement Type")
     vendor = fields.Many2one("emdad.contacts", string="Vendor")
-    vendors = fields.Many2many("emdad.contacts", string="Select Vendors")
     vendor_phone = fields.Char(string="Phone Number", related="vendor.phone")
     procurement_lines = fields.One2many("emdad.line.procurement", "related_procurement", string="Lines")
     process_type = fields.Selection([('market', 'Emdad Market'), ('direct', 'Direct'), ('multiple', 'Multiple Vendor')], string="Process Type")
+    direct_type = fields.Selection([('single','Single Vendor'), ('multi','Multiple Vendors')], string="Direct Type")
     payment_type = fields.Selection([('cash', 'Cash'), ('credit', 'Credit')], string="Payment Type")
     distribution_type = fields.Selection([('single', 'One Location'), ('multiple', 'Multiple Locations')], string="Distribution Type")
     total_before_discount = fields.Float(string="Total Before Discount")
@@ -37,10 +38,40 @@ class EmdadProcurement(models.Model):
     credit_balance = fields.Float(string="Credit Balance", related="credit_facility.balance")
     stages = fields.Char(compute="_get_stage", default="RFQ")
     procurement_backorder = fields.Boolean(compute="_get_backorder")
-    number_vendors = fields.Float(string="# of Vendors", compute="_number_vendors")
     emdad_category = fields.Many2one("product.emdad.category", string="Category")
     related_tender = fields.Many2one("emdad.tender", string="Related Tender")
+    related_offers = fields.One2many("emdad.procurement", "parent_rfq", string="Related Offers")
+    
+    def create_counter_offer(self):
+        for record in self:
+            record.parent_rfq = record.id
+            procurement_lines = []
+            for line in record.procurement_lines:
+                line_data = [
+                    (0, 0, {
+                        'product_id': line.product_id.id,
+                        'request_qty': line.request_qty,
+                        'is_packge': line.is_packge,
+                    }),          
+                ]
+                procurement_lines.extend(line_data)
 
+            counter_offer = self.env['emdad.procurement'].create({
+                'emdad_category' : record.emdad_category.id,
+                'effective_date' : record.effective_date,
+                'exp_quote' : record.exp_quote,
+                'operation_type' : record.operation_type,
+                'process_type' : record.process_type,
+                'direct_type' : record.direct_type,
+                'parent_rfq' : record.parent_rfq.id,
+                'payment_type' : record.payment_type,
+                'distribution_type' : record.distribution_type,
+                'single_location' : record.single_location.id,
+                'procurement_lines' : procurement_lines
+            })
+
+            record.ensure_one()
+            record.write({'parent_rfq': counter_offer.id})
     def print_vendor_bill(self):
         datas = self.env[self._name].browse(self.ids).read()[0]
         report_action = self.env.ref('emdad_procurement.emdad_procurement_report_action')
@@ -64,14 +95,6 @@ class EmdadProcurement(models.Model):
             'market_count': market_count,
             'multiple_count': multiple_count,
         }
-
-    @api.depends('vendors')
-    def _number_vendors(self):
-        for record in self:
-            if record.vendors and record.process_type == 'multiple':
-                record.number_vendors = len(record.vendors)
-            else:
-                record.number_vendors = 0
     
     @api.onchange('emdad_category')
     def change_category(self):
@@ -344,6 +367,9 @@ class EmdadProcurementLines(models.Model):
     expense_account = fields.Many2one("emdad.accounts", related="product_id.category.expense_account", string="Expense Account")
     attach = fields.Binary(string="Specifications")
     request_qty = fields.Float(string="Quantity")
+    is_packge = fields.Boolean(string="Is Package")
+    total_quantity = fields.Float(string="Total Quantity", compute="_cacl_qty")
+    package_qty = fields.Float(string="Package Quantity")
     product_cost = fields.Float(string="Cost")
     tax_amount = fields.Many2one("emdad.tax", string="Tax")
     total = fields.Float(string="Total", compute="_total_cost")
@@ -365,7 +391,22 @@ class EmdadProcurementLines(models.Model):
     proc_status = fields.Selection([('pending', 'Pending'),('active','Active'), ('closed','Closed'), ('expired','Expired'), ('recieve', 'Receiving'), ('recieved','Recieved')], string="Quote Status", default="pending", related="related_procurement.status")
     product_category = fields.Many2one("product.emdad.category", string="Product Category")
     related_tender = fields.Many2one("emdad.tender", string="Related Tender")
-
+    @api.depends('package_qty', 'request_qty')
+    def _cacl_qty(self):
+        for record in self:
+            if record.is_packge == True:
+                record.total_quantity = record.package_qty * record.request_qty
+                if record.package_qty == 0:
+                    record.package_qty = 1
+                else:
+                    pass
+            else:
+                record.total_quantity = 0
+    @api.onchange('packaging')
+    def _is_package(self):
+        for record in self:
+            if record.packaging:
+                record.is_packge = True
     @api.onchange('product_id')
     def get_default_metric(self):
         for record in self:

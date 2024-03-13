@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
      <!-- Sidebar App  -->
+    
     <t t-inherit="web.NavBar" t-inherit-mode="extension" owl="1">
         <xpath expr="//nav[hasclass('o_main_navbar')]" position="after">
             <div class="sidebar_panel" id="sidebar_panel">
@@ -40,6 +41,7 @@
     </t>
     <!--To add a new icon for home menu-->
     <t t-inherit="web.NavBar.AppsMenu" t-inherit-mode="extension" owl="1">
+        
         <xpath expr="//Dropdown" position="replace">
             <li class="dropdown" style="display:flex;">
                 <a id="openSidebar"

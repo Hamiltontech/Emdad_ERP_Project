@@ -2,6 +2,7 @@
 <templates xml:space="preserve">
 
 <t t-name="web.SwitchCompanyMenu">
+    <img class="oe_topbar_logo d-none d-lg-block" t-att-src="companyService.currentCompany.logo" alt="Company Logo"/>
     <Dropdown class="'o_switch_company_menu d-none d-md-block'" position="'bottom-end'">
         <t t-set-slot="toggler">
             <i class="fa fa-building d-lg-none"/>

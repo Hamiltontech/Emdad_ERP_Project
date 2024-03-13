@@ -6,11 +6,12 @@
         <field name="arch" type="xml">
             <form string="">
                 <header>
+                    <button type="object" name="print_report" string="Print DN"/>
                     <button type="object" name="approve_sales" string="Approve"
-                        invisible="so_status == 'approved'" />
+                        invisible="so_status != 'new'" />
                     <button type="object" name="cancel_sales" string="Cancel"
                         invisible="so_status == 'cancelled'" />
-                    <button type="object" name="create_delivery" string="Create Delivery" />
+                    <button type="object" name="create_delivery" string="Create Delivery" invisible="in_delivery == True"/>
                     <field name="so_status" widget="statusbar"
                         statusbar_visible="new,approved,cancelled,in_delivery,delivered" />
                 </header>
@@ -32,18 +33,19 @@
                             <field name="cr_number" />
                         </group>
                     </group>
-                    <group string="Logistics Information">
-                        <group>
-                            <field name="effective_date" required="1" />
-                            <field name="date" required="1" />
-                            <field name="delivery_type" />
-                            <field name="location" invisible="delivery_type != 'single'" />
+                    <group>
+                        <group string="Information">
+                            <field name="effective_date" required="1" readonly="in_delivery == True"/>
+                            <field name="schedulle" readonly="in_delivery == True"/>
+                            <field name="date" string="Expiary Date" required="1"/>
+                            <field name="in_delivery" invisible="1"/>
+                            <field name="related_delivery" invisible="in_delivery != True" readonly="1"/>
                         </group>
-                        <group>
-                            <field name="effective_date" />
-                            <field name="date" />
-                            <field name="delivery_type" />
-                            <field name="location" invisible="delivery_type != 'single'" />
+                        <group string="Settings">
+                           <field name="delivery_type"/>
+                           <field name="delivery_source"/>
+                           <field name="location" invisible="delivery_source != 'single'" />
+                           <field name="barcode"/>
                         </group>
                         <group>
                         </group>
@@ -92,7 +94,6 @@
                                                             : <field name="after_tax" /> SAR </div>
 
                                                         <div>
-                                                            <hr></hr>
                                                             <field name="description" />
                                                         </div>
                                                     </div>
@@ -112,10 +113,15 @@
                                     <field name="attach" widget="download_link"
                                         options="{'filename': 'attach_fname'}" />
                                     <!-- <field name="request_qty" /> -->
-                                    <field name="recieved_qty" />
+                                    <field name="qty" string="Demand"/>
+                                    <field name="recieved_qty" string="Delivered"/>
+                                    <field name="delivery_source"/>
+                                    <field name="location" readonly="delivery_source == 'single'" string="Source Location"/>
                                     <!-- <field name="difference" /> -->
                                     <field name="metric" />
                                     <field name="sent_status" />
+                                    <field name="delivery_type"/>
+                                    <field name="schedulle" readonly="delivery_type == 'single'"/>
                                     <!-- <field name="is_multiple" invisible="1" optional="hide" /> -->
                                     <!-- <field name="location" invisible="is_multiple != True" /> -->
                                 </tree>
@@ -205,7 +211,7 @@
                         <group string="Basic Information">
                             <field name="product_id"/>
                             <field name="barcode"/>
-                            <field name="description"/>         
+                            <field name="description"/>
                         </group>
                         <group string="Request Information">
                             <field name="request_qty" string="Requested Quantity"/>
@@ -215,10 +221,9 @@
                     </group>
                     <group>
                         <group string="Financial Information">
-                            <field name="price_list" domain="[('related_product', '=', product_id)]"/>
-                            <field name="discount"/>
+                            <field name="price_list" domain="[('related_product', '=', product_id), ('min_qty', '&lt;=', request_qty), ('max_qty', '&gt;=', request_qty), ('status', '=', 'active')]"/>
+                            <field name="price"/>
                             <field name="tax" domain="[('scope', '=', 'sales')]"/>
-                            <field name="total"/>
                             <field name="final_total"/>
                         </group>
                         <group string="Delivery Information">

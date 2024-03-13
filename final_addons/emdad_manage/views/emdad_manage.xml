@@ -6,8 +6,14 @@
         <field name="arch" type="xml">
             <form string="">
             <header>
-            <button string="Restart Server" type="object" name="restart_server"/>
-            <button string="Shut Down" type="object" name="shut_down_server"/>
+            <button name="create_server" string="Create Server" type="object" invisible="server_created == True"/>
+            <button name="get_snapshot_by_name" string="Update Info" type="object" invisible="server_created == False"/>
+            <button string="Restart Server" type="object" name="reboot_instance" invisible="server_created == False"/>
+            <button string="Shut Down" type="object" name="stop_instance" invisible="server_created == False"/>
+            <button string="Run Server" type="object" name="start_instance" invisible="server_created == False"/>
+            <field name="server_created" invisible="1"/>
+            <field name="stopped" invisible="1"/>
+            <filed name="running" invisible="1"/>
             <field name="status" widget="statusbar" statusbar_visible="new,active,expired"/>
             </header>
                 <sheet>
@@ -74,11 +80,19 @@
                     <page name="tickets" string="Tickets">
                         <field name="tickets" widget="One2many_list">
                             <tree>
-                                <field name="name"/>
                                 <field name="type"/>
                                 <field name="create_date"/>
                                 <field name="related_to"/>
                                 <field name="status"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page name="log" string="Action Log">
+                        <field name="server_log" widget="One2many_list">
+                            <tree>
+                                <field name="status"/>
+                                <field name="message"/>
+                                <field name="create_date"/>
                             </tree>
                         </field>
                     </page>

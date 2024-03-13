@@ -1,10 +1,15 @@
 from emdad import api, fields, models
 from emdad.exceptions import ValidationError
+import barcode
+from barcode.writer import ImageWriter
+from io import BytesIO
+
 
 class EmdadSales(models.Model):
     _name="emdad.sales"
     #customer information added by laith
     name = fields.Char(string="Sales ID", compute="_get_name")
+    barcode = fields.Char(string='Barcode', copy=False)
     date = fields.Date(string="Date Assigned",required=True)
     effective_date = fields.Date(string="Assigned Date",required=True)
     customer = fields.Many2one("emdad.contacts")
@@ -12,7 +17,9 @@ class EmdadSales(models.Model):
     email = fields.Char(string="Email", related="customer.email")
     cr_number = fields.Char(string="CR Number", related="customer.cr_number")
     #sales information by laith
-    delivery_type = fields.Selection([('multiple', 'Multiple Locations'), ('single','Single Location')], string="Delivery Type")
+    delivery_type = fields.Selection([('multiple', 'Multiple Deliveries / Schedulled'), ('single','Single Time Delivery / Full')], string="Delivery Type")
+    schedulle = fields.Datetime(string="Schedulled Delivery")
+    delivery_source = fields.Selection([('single','From One Location'),('multiple','From Multiple Locations')])
     location = fields.Many2one("emdad.warehouse.location", string="Assigned Location")
     total = fields.Float(string="Total", compute="_get_total_lines")
     #sales Lines
@@ -20,6 +27,17 @@ class EmdadSales(models.Model):
     so_status = fields.Selection([('new','New'), ('approved','Approved'), ('cancelled','Cancelled'), ('in_delivery','In Delivery'),('delivered','Delivered')], string="Status", default="new")
     in_delivery = fields.Boolean(string="In Delivery")
     stages = fields.Char(compute="_get_stage", default="RFP")
+    related_delivery = fields.Many2one("emdad.warehouse.quants", string="Related Delivery")
+    def generate_barcode(self):
+        barcode_value = "YourBarcodeValue"  # Replace with your actual barcode value
+        ean = barcode.get('code128', barcode_value, writer=ImageWriter())
+        buffer = BytesIO()
+        ean.write(buffer)
+       
+        self.write({'barcode': barcode_value})
+
+    def print_report(self):
+        return self.env.ref('emdad_sales.action_report_delivery_note').report_action(self)
     def create_delivery(self):
         quants = self.env['emdad.warehouse.quants']
         for record in self:
@@ -37,6 +55,9 @@ class EmdadSales(models.Model):
                 }) for line in record.order_lines]
             }
             quants_record = quants.create(data_to_copy)
+            record.related_delivery = quants_record.id
+            record.generate_barcode()
+            
     @api.onchange('delivery_type', 'location')
     def assign_the_location(self):
         for record in self:
@@ -84,9 +105,10 @@ class EmdadSalesLines(models.Model):
     _name="emdad.sales.line"
 
     name = fields.Char(string="ID Line")
-    delivery_type = fields.Selection([('multiple', 'Multiple Locations'), ('single','Single Location')], related="related_sales.delivery_type" ,string="Delivery Type")
+    # delivery_type = fields.Selection([('multiple', 'Multiple Locations'), ('single','Single Location')], related="related_sales.delivery_type" ,string="Delivery Type")
+    delivery_source = fields.Selection([('single','From One Location'),('multiple','From Multiple Locations')], related="related_sales.delivery_source", string="Delivery Source")
     related_sales = fields.Many2one("emdad.sales", string="Related SO")
-    delivery_type = fields.Selection([('multiple', 'Multiple Locations'), ('single','Single Location')], related="related_sales.delivery_type", string="Delivery Type")
+    delivery_type = fields.Selection([('multiple', 'Schedulled'), ('single','Single Time Deliveryx ')], string="Delivery Type", related="related_sales.delivery_type")
     product = fields.Many2one("product.management", string="Product")
     barcode = fields.Char(string="Barcode", related="product.barcode")
     batch = fields.Many2one("emdad.warehouse.batches", string="Batch")
@@ -104,7 +126,6 @@ class EmdadSalesLines(models.Model):
     tax_amount = fields.Float(string="Tax Amount", readonly=True)
     after_tax = fields.Float(string="Total Inc.", compute="_calculate_tax")
     in_delivery = fields.Boolean(string="In Delivery", related="related_sales.in_delivery")
-    ##
     product_image = fields.Binary(string="Product Image", related="product_id.product_image")
     product_id = fields.Many2one("product.management", string="Product", ondelete="cascade")
     description = fields.Text(string="Description")
@@ -112,6 +133,14 @@ class EmdadSalesLines(models.Model):
     attach = fields.Binary(string="Specifications")
     request_qty = fields.Float(string="Quantity")
     price_list = fields.Many2one("emdad.products.pricing", string="Price List")
+    schedulle = fields.Datetime(string="Schedule")
+    @api.onchange('price_list')
+    def select_pricing(self):
+        for record in self: 
+            if record.price_list:
+                record.price = record.price_list.price
+            else:
+                record.price = 0.0
 
     @api.depends('recieved_qty')
     def _get_status(self):
@@ -164,5 +193,9 @@ class EmdadSalesLines(models.Model):
         for record in self:
             if record.delivery_type == 'single':
                 record.location = record.related_sales.location
+                record.schedulle = record.related_sales.schedulle
+            elif record.delivery_type == 'multiple':
+                record.location = ''
+                record.schedulle = record.related_sales.schedulle
             else:
                 pass

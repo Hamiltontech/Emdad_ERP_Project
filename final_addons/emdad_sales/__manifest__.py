@@ -12,7 +12,9 @@
     ],
     'data': [
         'views/sales_order_view.xml',
-        'security/ir.model.access.csv'
+        'security/ir.model.access.csv',
+        'reports/delivery_note.xml',
+        'reports/delivery_note_action.xml'
     ],
     'demo': [
         ''

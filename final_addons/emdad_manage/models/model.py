@@ -2,11 +2,13 @@ from emdad import fields, models, api
 from datetime import datetime
 import requests
 from twilio.rest import Client
+import boto3
 
 class EmdadCustomer(models.Model):
     _name="emdad.customer"
 
     name = fields.Char(string="Customer ID", compute="_compute_subscription_id")
+    update = fields.Char(string="Updates")
     contact_name = fields.Char(string="Contact Name", compute="_make_name")
     first_name = fields.Char(string="First Name")
     middle_name = fields.Char(string="Second Name")
@@ -36,7 +38,169 @@ class EmdadCustomer(models.Model):
     server_action = fields.Selection([('running','Running'), ('restarting','Restarting'), ('down','Down')], string="Server Action", default="running")
     tickets = fields.One2many("emdad.support", "related_subscription", string="Tickets")
     status_char = fields.Char(string="Status (Char)", compute="_compute_status_char", store=True, readonly=True)
+    server_created = fields.Boolean(string="Server Created")
+    server_log = fields.One2many("emdad.server.log", "related_subscription", string="Log")
+    restarted = fields.Boolean(string="Restarted")
+    running = fields.Boolean(string="Running")
+    stopped = fields.Boolean(string="Stopped")
+    def create_server(self):
+        for record in self:
+            record.server_created = True
+            record.plan = 'nano'
+            server_name = record.name
+            aws_access_key_id = 'AKIAX7A7NBVMJWLVM6BX'
+            aws_secret_access_key = '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'
+            region_name = 'eu-central-1'
 
+            snapshot_name = 'emdad-erp-1704555745'
+            instance_name = server_name
+            instance_plan = 'small_3_0'
+
+            lightsail = boto3.client('lightsail', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key, region_name=region_name)
+
+            snapshot = self.get_snapshot_by_name(lightsail, snapshot_name)
+
+            if snapshot:
+                response = lightsail.create_instances_from_snapshot(
+                    instanceNames=[instance_name],
+                    availabilityZone=region_name + 'a', 
+                    instanceSnapshotName=snapshot['name'],
+                    bundleId=instance_plan,
+                    tags=[
+                        {
+                            'key': 'Name',
+                            'value': instance_name
+                        }
+                    ]
+                )
+                record.ip_address = 'created'
+                
+                print(f"Server created successfully from snapshot: {snapshot['name']}")
+                logs = self.env['emdad.server.log']
+                for log in self:
+                    data_to_copy = {
+                        'related_subscription' : log.id,
+                        'status' : 'Emdad Created',
+                        'message' : f"Server created successfully from snapshot: {snapshot['name']}"
+                    }
+                    created_log = logs.create(data_to_copy)
+            else:
+                print(f"Snapshot with name '{snapshot_name}' not found.")
+                logs = self.env['emdad.server.log']
+                for log in self:
+                    data_to_copy = {
+                        'related_subscription' : log.id,
+                        'status' : 'ERROR Emdad Created',
+                        'message' : f"Snapshot with name '{snapshot_name}' not found."
+                    }
+                    created_log = logs.create(data_to_copy)
+
+    def get_snapshot_by_name(self, lightsail, snapshot_name):
+        snapshots = lightsail.get_instance_snapshots()
+        print("Snapshots Response:", snapshots)
+        for snapshot in snapshots['instanceSnapshots']:
+            if snapshot['name'] == snapshot_name:
+                return snapshot
+            for record in self:
+                record.ip_address = 'hello'
+        return None
+
+    def reboot_instance(self):
+        for record in self:
+            instance_name = record.name
+
+            aws_access_key_id = 'AKIAX7A7NBVMJWLVM6BX'
+            aws_secret_access_key = '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'
+            region_name = 'eu-central-1'
+
+            lightsail = boto3.client('lightsail', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key, region_name=region_name)
+
+            try:
+                response = lightsail.reboot_instance(instanceName=instance_name)
+                # record.update = f"Reboot request sent for instance: {instance_name}"
+                logs = self.env['emdad.server.log']
+                for log in self:
+                    data_to_copy = {
+                        'related_subscription' : log.id,
+                        'status' : 'Server Restarted',
+                        'message' : f"Reboot request sent for instance: {instance_name}"
+                    }
+                    created_log = logs.create(data_to_copy)
+                    log.restarted = True
+                    log.running = False
+            except Exception as e:
+                logs = self.env['emdad.server.log']
+                for log in self:
+                    data_to_copy = {
+                        'related_subscription' : log.id,
+                        'status' : 'ERROR Server Restarted',
+                        'message' : f"Error rebooting instance {instance_name}: {e}"
+                    }
+                    created_log = logs.create(data_to_copy)
+    def stop_instance(self):
+        for record in self:
+            instance_name = record.name  # Adjust this according to your model structure
+
+            aws_access_key_id = 'AKIAX7A7NBVMJWLVM6BX'
+            aws_secret_access_key = 'uFZJQPsRQGDWKbmJXAZgvlVwqOdoqokTL1tL087V'
+            region_name = 'eu-central-1'
+
+            # Create a Lightsail client
+            lightsail = boto3.client('lightsail', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key, region_name=region_name)
+
+            # Stop the instance
+            try:
+                response = lightsail.stop_instance(instanceName=instance_name, force=False)
+                logs = self.env['emdad.server.log']
+                for log in self:
+                    data_to_copy = {
+                        'related_subscription' : log.id,
+                        'status' : 'ERROR Server Stopped',
+                        'message' : f"Stop request sent for instance: {instance_name}"
+                    }
+                    created_log = logs.create(data_to_copy)
+                    log.stopped = True
+                    log.running = False
+            except Exception as e:
+                logs = self.env['emdad.server.log']
+                for log in self:
+                    data_to_copy = {
+                        'related_subscription' : log.id,
+                        'status' : 'ERROR Server Stopped',
+                        'message' : f"Error stopping instance {instance_name}: {e}"
+                    }
+                    created_log = logs.create(data_to_copy)
+    def start_instance(self):
+        for record in self:
+            instance_name = record.name  # Adjust this according to your model structure
+
+            aws_access_key_id = 'AKIAX7A7NBVMJWLVM6BX'
+            aws_secret_access_key = 'uFZJQPsRQGDWKbmJXAZgvlVwqOdoqokTL1tL087V'
+            region_name = 'eu-central-1'
+
+            lightsail = boto3.client('lightsail', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key, region_name=region_name)
+
+            try:
+                response = lightsail.start_instance(instanceName=instance_name)
+                logs = self.env['emdad.server.log']
+                for log in self:
+                    data_to_copy = {
+                        'related_subscription' : log.id,
+                        'status' : 'Server Started',
+                        'message' : f"Start request sent for instance: {instance_name}"
+                    }
+                    created_log = logs.create(data_to_copy)
+                    log.stopped = False
+                    log.running = True
+            except Exception as e:
+                logs = self.env['emdad.server.log']
+                for log in self:
+                    data_to_copy = {
+                        'related_subscription' : log.id,
+                        'status' : 'Server Started',
+                        'message' : f"Error starting instance {instance_name}: {e}"
+                    }
+                    created_log = logs.create(data_to_copy)
     @api.depends("status")
     def _compute_status_char(self):
         for record in self:
@@ -45,10 +209,14 @@ class EmdadCustomer(models.Model):
     @api.depends('start_date')
     def _compute_subscription_id(self):
         for record in self:
-            if record.id:
-                year_month = record.start_date.strftime('%Y%m') if record.start_date else '000000'
-                subscription_id = f"EMDAD{year_month}{record.id}"
-                record.name = subscription_id
+            if record.start_date:
+                year_month = record.start_date.strftime('%Y%m')
+            else:
+                year_month = '000000'
+            
+            subscription_id = f"EMDAD{year_month}{record.id}"
+            record.name = subscription_id
+
     @api.depends('next_renewal')    
     def _calculate_days_until_renewal(self):
         for record in self:
@@ -182,3 +350,11 @@ class EmdadSupport(models.Model):
                 record.name = ticket_id
             else:
                 record.name = 'NOT DEFINED'
+
+class EmdadServerLog(models.Model):
+    _name="emdad.server.log"
+
+    name = fields.Char(string="Log ID")
+    related_subscription = fields.Many2one("emdad.customer", string="Related Subscription")
+    status = fields.Char(string="Status")
+    message = fields.Text(string="Message")
