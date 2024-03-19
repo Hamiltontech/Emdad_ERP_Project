@@ -31,3 +31,36 @@ class Procurement(http.Controller):
             headers=[("Cache-Control", "no-store"), ("Pragma", "no-cache"),("Access-Control-Allow-Origin","*"),("Access-Control-Allow-Headers","*")],
             response=json.dumps(procurements, default=str)
         )
+    
+    @http.route("/api/v1/procurement/update", methods=["PUT"], type="http", auth="none", csrf=False)
+    def update_procurements(self, **post):
+                
+        payload = request.httprequest.data.decode()
+
+        if not payload:
+            print("-----------")
+            return werkzeug.wrappers.Response(
+            status=200,
+            content_type="application/json; charset=utf-8",
+            headers=[("Cache-Control", "no-store"), ("Pragma", "no-cache"),("Access-Control-Allow-Origin","*"),("Access-Control-Allow-Headers","*")],
+            response=json.dumps("", default=str)
+            )
+        
+
+        data = json.loads(payload)
+        print(55555555555,data)
+        for po_line in data['data']:
+            print(po_line)
+            po_line_id = po_line['related_remote_po_line']
+            records_to_update = request.env['emdad.line.procurement'].sudo().search([('id', '=', po_line_id)])
+            print(records_to_update)
+            for record in records_to_update:
+                record.write({'product_cost': po_line['price'],})
+                print(record.read())
+
+        return werkzeug.wrappers.Response(
+            status=200,
+            content_type="application/json; charset=utf-8",
+            headers=[("Cache-Control", "no-store"), ("Pragma", "no-cache"),("Access-Control-Allow-Origin","*"),("Access-Control-Allow-Headers","*")],
+            response=json.dumps(data, default=str)
+        )

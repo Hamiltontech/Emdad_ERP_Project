@@ -1,6 +1,10 @@
 from emdad import api, fields, models
 from datetime import datetime, date
-from emdad.exceptions import ValidationError
+from emdad import exceptions
+import xmlrpc.client
+import requests
+import json
+import copy
 
 class EmdadProcurement(models.Model):
     _name = "emdad.procurement"
@@ -41,6 +45,68 @@ class EmdadProcurement(models.Model):
     emdad_category = fields.Many2one("product.emdad.category", string="Category")
     related_tender = fields.Many2one("emdad.tender", string="Related Tender")
     related_offers = fields.One2many("emdad.procurement", "parent_rfq", string="Related Offers")
+    is_sent = fields.Boolean(string="Is Sent")
+    
+
+    # def send_direct_offer(self):
+    #     for record in self:
+    #         record.is_sent = True
+    #         remote_url = 'https://admin.emdad.com'
+    #         remote_db = 'emdad'
+    #         remote_username = 'emdad'
+    #         remote_password = '210@Carringtonrd'
+ 
+    #         target_model = 'emdad.send'
+    #         target_url = f'{remote_url}/xmlrpc/2/object'
+ 
+    #         common_proxy = xmlrpc.client.ServerProxy(f'{remote_url}/xmlrpc/2/common')
+    #         uid = common_proxy.authenticate(remote_db, remote_username, remote_password, {})
+    #         new_record_id = models_proxy.execute_kw(remote_db, uid, remote_password, target_model, 'create', [{'name': remote_name}])
+    #         return new_record_id
+
+    def send_direct_offer(self):
+
+        po_company_cr = self.env['res.company'].sudo().search_read([],['cr_number'])
+
+        for record in self:
+            record.is_sent = True
+
+            url = "http://localhost:8024/api/v1/sales/direct/create/"
+            data = record.read()
+            data[0]['parent_rfq'] = self.read_all(record.parent_rfq) if record.parent_rfq else []
+            data[0]['vendor'] = self.read_all(record.vendor) if record.vendor else []
+            data[0]['procurement_lines'] = self.read_all(record.procurement_lines) if record.procurement_lines else []
+            data[0]['emdad_category'] = self.read_all(record.emdad_category) if record.emdad_category else []
+            data[0]['single_location'] = self.read_all(record.single_location) if record.single_location else []
+            data[0]['related_tender'] = self.read_all(record.related_tender) if record.related_tender else []
+            data[0]['related_offers'] = self.read_all(record.related_offers) if record.related_offers else []
+            data[0]['procurement_lines'] = self.read_all_procurement_lines(record.procurement_lines) if record.procurement_lines else []
+            data[0]['po_company_cr'] = po_company_cr[0] if po_company_cr else []
+
+            payload = json.dumps(data,default=str)
+            headers = {
+            'Content-Type': 'application/json',
+            }
+
+            response = requests.request("POST", url, headers=headers, data=payload)
+            raise exceptions.UserError(response.text)
+        
+    def read_all_procurement_lines(self,record):
+        procurement_lines = []
+        for line_procurement in record:
+            product_id = line_procurement.product_id
+            procurement = line_procurement.read()[0]
+            procurement['product_id'] = product_id.read(['barcode'])
+            procurement_lines.append(procurement)
+        return procurement_lines
+
+
+    def read_all(self, record):
+        sub_record = []
+        for sub in record:
+            sub_dict = sub.read()
+            sub_record.append(*sub_dict)
+        return sub_record
     
     def create_counter_offer(self):
         for record in self:

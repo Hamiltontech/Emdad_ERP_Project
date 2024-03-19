@@ -6,6 +6,7 @@
     <field name="arch" type="xml">
         <form string="">
         <header>
+            <button string="Send to Vendor" name="send_direct_offer" type="object"/>
             <button string="Approve" type="object" name="approve_quote" invisible = "status == 'active'"/>
             <button string="Publish" type="object" name="publish_quote" invisible = "published == True"/>
             <button string="Close Order" type="object" name="close_quote" invisible = "status != 'active'"/>
