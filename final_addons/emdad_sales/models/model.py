@@ -3,6 +3,8 @@ from emdad.exceptions import ValidationError
 import barcode
 from barcode.writer import ImageWriter
 from io import BytesIO
+import json
+import requests
 
 
 class EmdadSales(models.Model):
@@ -28,6 +30,32 @@ class EmdadSales(models.Model):
     in_delivery = fields.Boolean(string="In Delivery")
     stages = fields.Char(compute="_get_stage", default="RFP")
     related_delivery = fields.Many2one("emdad.warehouse.quants", string="Related Delivery")
+    related_remote_po = fields.Integer(string="Customer PO ID")
+    
+    def respond_to_direct_offer(self):
+        for record in self:
+            # record.is_sent = True
+
+            response = {}
+            url = "http://localhost:8022/api/v1/procurement/update"
+            data = record.order_lines.read(['price','related_remote_po_line'])
+            response['data'] = data
+            response['related_remote_po'] = record.read(['related_remote_po'])
+            payload = json.dumps(response,default=str)
+
+            
+            print(payload)
+
+            headers = {
+            'Content-Type': 'application/json',
+            }
+
+            response = requests.request("PUT", url, headers=headers, data=payload)
+
+            # print(response.text)
+        
+            
+    
     def generate_barcode(self):
         barcode_value = "YourBarcodeValue"  # Replace with your actual barcode value
         ean = barcode.get('code128', barcode_value, writer=ImageWriter())
@@ -134,6 +162,7 @@ class EmdadSalesLines(models.Model):
     request_qty = fields.Float(string="Quantity")
     price_list = fields.Many2one("emdad.products.pricing", string="Price List")
     schedulle = fields.Datetime(string="Schedule")
+    related_remote_po_line = fields.Integer(string="Customer PO Line ID")
     @api.onchange('price_list')
     def select_pricing(self):
         for record in self: 

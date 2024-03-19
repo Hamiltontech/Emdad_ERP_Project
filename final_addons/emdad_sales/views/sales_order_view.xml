@@ -6,6 +6,7 @@
         <field name="arch" type="xml">
             <form string="">
                 <header>
+                    <button string="Send to Customer" name="respond_to_direct_offer" type="object"/>
                     <button type="object" name="print_report" string="Print DN"/>
                     <button type="object" name="approve_sales" string="Approve"
                         invisible="so_status != 'new'" />
