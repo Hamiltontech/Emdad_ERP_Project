@@ -14,7 +14,7 @@
             <button string="Create Bill" type="object" name="create_bill_je" invisible="bill_status == 'created'"/>
             <button string="Create Payment" type="object" name="create_payment" invisible="payment_status == 'paid'"/>
             <button string="Print Bill" type="object" name="print_vendor_bill"/>
-            <button string="Create Counter Offer" type="object" name="create_counter_offer" class="btn-warning" invisible="direct_type == 'direct'"/>
+            <button string="Create Counter Offer" type="object" name="create_counter_offer" class="btn-warning" invisible="distribution_type != 'multiple'"/>
             <field name="status" widget="statusbar" statusbar_visible="pending,active,closed,expired,recieve" />
         </header>
             <sheet>
@@ -33,7 +33,7 @@
                 <field name="operation_type"/>
                 <field name="process_type"/>
                 <field name="direct_type" invisible="process_type != 'direct'"/>
-                <field name="parent_rfq" invisible="process_type != 'direct'"/>
+                <field name="parent_rfq" invisible="process_type != 'direct'" readonly="1"/>
                 <field name="payment_type"/>
                 <field name="distribution_type"/>
                 <field name="single_location" invisible = "distribution_type != 'single'" domain="[('used_reciepts', '=', True)]"/>
@@ -197,6 +197,7 @@
                 <group>
                     <group string="Logistics">
                         <field name="location"/>
+                        <field name="location_address"/>
                         <field name="recieved_qty" invisible="proc_status != 'recieve'"/>
                         <field name="recieve_status" widget="badge" invisible="proc_status != 'recieve'"/>
                         <field name="proc_status" invisible="1"/>

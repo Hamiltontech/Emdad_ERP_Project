@@ -11,10 +11,19 @@ class EmdadWarehouse(models.Model):
     address = fields.Char(string="Address")
     city = fields.Many2one("res.country.state", string="City")
     country = fields.Many2one("res.country")
+    full_address = fields.Char(string="Full Address", compute="_full_address")
     locations = fields.One2many("emdad.warehouse.location", "related_warehouse", String="Locations")
     locations_count = fields.Integer(string="Number of Locations", compute="_number_locations", store=True)
     total_qty = fields.Float(string="Total Quantity", compute="_total_quantities")
     warehouse_manager = fields.Many2one("emdad.hr", string="Warehouse Manager")
+    @api.depends('address', 'city', 'country')
+    def _full_address(self):
+        for record in self:
+            if record.address and record.city and record.country:
+                record.full_address = record.address + ',' + record.city.name + ',' + record.country.name
+            else:
+                record.full_address = 'UNDEFINED'
+                
     @api.depends('locations')
     def _total_quantities(self):
         for record in self:

@@ -218,6 +218,7 @@
                             <field name="request_qty" string="Requested Quantity"/>
                             <field name="attach"/>
                             <field name="delivery_type"/>
+                            <field name="location_address" readonly="1"/>
                         </group>
                     </group>
                     <group>

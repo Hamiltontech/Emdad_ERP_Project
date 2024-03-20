@@ -163,6 +163,7 @@ class EmdadSalesLines(models.Model):
     price_list = fields.Many2one("emdad.products.pricing", string="Price List")
     schedulle = fields.Datetime(string="Schedule")
     related_remote_po_line = fields.Integer(string="Customer PO Line ID")
+    location_address = fields.Char(string="Customer Address")
     @api.onchange('price_list')
     def select_pricing(self):
         for record in self: 
