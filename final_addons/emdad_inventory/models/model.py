@@ -14,7 +14,7 @@ class EmdadWarehouse(models.Model):
     full_address = fields.Char(string="Full Address", compute="_full_address")
     locations = fields.One2many("emdad.warehouse.location", "related_warehouse", String="Locations")
     locations_count = fields.Integer(string="Number of Locations", compute="_number_locations", store=True)
-    total_qty = fields.Float(string="Total Quantity", compute="_total_quantities")
+    total_qty = fields.Float(string="Total Quantity")
     warehouse_manager = fields.Many2one("emdad.hr", string="Warehouse Manager")
     @api.depends('address', 'city', 'country')
     def _full_address(self):
@@ -27,11 +27,17 @@ class EmdadWarehouse(models.Model):
     @api.depends('locations')
     def _total_quantities(self):
         for record in self:
-            record.total_qty = sum(product.quantity for product in record.locations)
+            if record.locations:
+                record.total_qty = sum(product.quantity for product in record.locations)
+            else:
+                pass
     @api.depends('locations')
     def _number_locations(self):
         for record in self:
-            record.locations_count = len(record.locations)
+            if record.locations:
+                record.locations_count = len(record.locations)
+            else:
+                pass
 class EmdadLocations(models.Model):
     _name = 'emdad.warehouse.location'
 

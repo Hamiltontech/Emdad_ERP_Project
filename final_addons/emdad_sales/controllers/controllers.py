@@ -95,7 +95,7 @@ class Procurement(http.Controller):
         if not payload:
             print("-----------")
             return werkzeug.wrappers.Response(
-            status=200,
+            status=400,
             content_type="application/json; charset=utf-8",
             headers=[("Cache-Control", "no-store"), ("Pragma", "no-cache"),("Access-Control-Allow-Origin","*"),("Access-Control-Allow-Headers","*")],
             response=json.dumps("no data sent", default=str)
@@ -134,7 +134,7 @@ class Procurement(http.Controller):
                         status=409,
                         content_type="application/json; charset=utf-8",
                         headers=[("Cache-Control", "no-store"), ("Pragma", "no-cache"),("Access-Control-Allow-Origin","*"),("Access-Control-Allow-Headers","*")],
-                        response=json.dumps("record did not created, product not found", default=str)
+                        response=json.dumps("SO record did not created, product not found in vendor system", default=str)
                     )
                 # metric_unit = product_local_id.selling_metric.
                 sales_lines_vals = {
@@ -163,14 +163,14 @@ class Procurement(http.Controller):
 
             
             return werkzeug.wrappers.Response(
-                status=200,
+                status=201,
                 content_type="application/json; charset=utf-8",
                 headers=[("Cache-Control", "no-store"), ("Pragma", "no-cache"),("Access-Control-Allow-Origin","*"),("Access-Control-Allow-Headers","*")],
                 response=json.dumps("Sales Order Successfully Created", default=str)
             )
         else:
             return werkzeug.wrappers.Response(
-                status=200,
+                status=409,
                 content_type="application/json; charset=utf-8",
                 headers=[("Cache-Control", "no-store"), ("Pragma", "no-cache"),("Access-Control-Allow-Origin","*"),("Access-Control-Allow-Headers","*")],
                 response=json.dumps("Your company is not exists in vendor contacts", default=str)

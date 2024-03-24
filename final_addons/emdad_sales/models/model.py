@@ -26,7 +26,7 @@ class EmdadSales(models.Model):
     total = fields.Float(string="Total", compute="_get_total_lines")
     #sales Lines
     order_lines = fields.One2many("emdad.sales.line","related_sales", string="Order Lines")
-    so_status = fields.Selection([('new','New'), ('approved','Approved'), ('cancelled','Cancelled'), ('in_delivery','In Delivery'),('delivered','Delivered')], string="Status", default="new")
+    so_status = fields.Selection([('new','New'),('approved','Approved'), ('cancelled','Cancelled'), ('in_delivery','In Delivery'),('delivered','Delivered')], string="Status", default="new")
     in_delivery = fields.Boolean(string="In Delivery")
     stages = fields.Char(compute="_get_stage", default="RFP")
     related_delivery = fields.Many2one("emdad.warehouse.quants", string="Related Delivery")
@@ -35,12 +35,14 @@ class EmdadSales(models.Model):
     def respond_to_direct_offer(self):
         for record in self:
             # record.is_sent = True
+            record.so_status = "approved"
 
             response = {}
             url = "http://localhost:8022/api/v1/procurement/update"
             data = record.order_lines.read(['price','related_remote_po_line'])
             response['data'] = data
-            response['related_remote_po'] = record.read(['related_remote_po'])
+            response['related_remote_po'] = record.related_remote_po
+            response['so_name'] = record.name
             payload = json.dumps(response,default=str)
 
             
@@ -67,8 +69,19 @@ class EmdadSales(models.Model):
     def print_report(self):
         return self.env.ref('emdad_sales.action_report_delivery_note').report_action(self)
     def create_delivery(self):
+
+
         quants = self.env['emdad.warehouse.quants']
         for record in self:
+
+            response = {}
+            url = "http://localhost:8022/api/v1/procurement/receiving"
+            response['related_remote_po'] = record.related_remote_po
+            payload = json.dumps(response,default=str)
+            headers = {'Content-Type': 'application/json'}
+            response = requests.request("PUT", url, headers=headers, data=payload)
+            print(record.related_remote_po)
+
             record.in_delivery = True
             record.so_status = 'in_delivery'
             data_to_copy = {
