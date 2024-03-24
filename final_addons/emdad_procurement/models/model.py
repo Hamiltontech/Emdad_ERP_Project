@@ -46,6 +46,7 @@ class EmdadProcurement(models.Model):
     related_tender = fields.Many2one("emdad.tender", string="Related Tender")
     related_offers = fields.One2many("emdad.procurement", "parent_rfq", string="Related Offers")
     is_sent = fields.Boolean(string="Is Sent")
+    related_remote_so = fields.Char(string="Related Remote Sales Order")
     
 
     # def send_direct_offer(self):
@@ -69,7 +70,7 @@ class EmdadProcurement(models.Model):
         po_company_cr = self.env['res.company'].sudo().search_read([],['cr_number'])
 
         for record in self:
-            record.is_sent = True
+
 
             url = "http://localhost:8024/api/v1/sales/direct/create/"
             data = record.read()
@@ -87,9 +88,21 @@ class EmdadProcurement(models.Model):
             headers = {
             'Content-Type': 'application/json',
             }
+            try:
+                response = requests.request("POST", url, headers=headers, data=payload)
+                if response.status_code == 201:
+                    record.is_sent = True
+                else:
+                    raise exceptions.UserError('message')
 
-            response = requests.request("POST", url, headers=headers, data=payload)
-            raise exceptions.UserError(response.text)
+            except exceptions.UserError as e:
+                if response.status_code == 409:
+                    print(response.text)
+                    raise exceptions.UserError(response.text)
+                
+            except Exception as e:
+                print(e)
+                raise exceptions.UserError("Somthing wrong in vondor server, Try agin later")
         
     def read_all_procurement_lines(self,record):
         procurement_lines = []
