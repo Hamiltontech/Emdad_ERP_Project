@@ -1,6 +1,7 @@
 from emdad import api, fields, models
 from datetime import datetime, date
 from emdad import exceptions
+from emdad import http
 import xmlrpc.client
 import requests
 import json
@@ -65,14 +66,34 @@ class EmdadProcurement(models.Model):
     #         new_record_id = models_proxy.execute_kw(remote_db, uid, remote_password, target_model, 'create', [{'name': remote_name}])
     #         return new_record_id
 
+    def get_vendor_base_url(self):
+
+        for record in self:
+            vendor = record.vendor.read(['cr_number'])
+            if not vendor:
+                raise exceptions.UserError("Vendor must be selected")
+            vendor_cr_number = vendor[0].get('cr_number')
+
+            url = f"http://localhost:8023/api/v1/slave/baseurl?company_cr={vendor_cr_number}"
+            headers = {'Content-Type': 'application/json',}
+            response = requests.request("GET", url, headers=headers)
+            response_data = json.loads(response.text)
+            if not response_data:
+                raise exceptions.UserError("Vendor suspended from emdad platform, make sure the cr number is correct in vendor contact")
+            base_url = response_data[0]['domain_name']
+            print(base_url)
+
+            return base_url
+        
     def send_direct_offer(self):
 
         po_company_cr = self.env['res.company'].sudo().search_read([],['cr_number'])
+        vendor_base_url = self.get_vendor_base_url()
 
         for record in self:
 
 
-            url = "http://localhost:8024/api/v1/sales/direct/create/"
+            url = vendor_base_url+"/api/v1/sales/direct/create/"
             data = record.read()
             data[0]['parent_rfq'] = self.read_all(record.parent_rfq) if record.parent_rfq else []
             data[0]['vendor'] = self.read_all(record.vendor) if record.vendor else []
