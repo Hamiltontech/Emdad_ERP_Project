@@ -32,6 +32,7 @@ class EmdadContacts(models.Model):
     selling_transactions = fields.Integer(compute='_compute_total_selling_transactions',string="Total selling transactions")
     procurement_transactions = fields.Integer(compute='_compute_total_procurement_transactions',string="Total procurement transactions")
     category = fields.Many2one("product.emdad.category", string="Related Category")
+    
     def on_cr_number(self):
         if self.cr_number:
             api_url = f'https://api.wathq.sa/v5/commercialregistration/info/{self.cr_number}'

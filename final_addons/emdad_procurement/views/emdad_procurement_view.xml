@@ -6,6 +6,8 @@
     <field name="arch" type="xml">
         <form string="">
         <header>
+            <button string="Send to Vendor" name="send_direct_offer" type="object" invisible="is_sent == True"/>
+            <field name="is_sent" invisible="1"/>
             <button string="Approve" type="object" name="approve_quote" invisible = "status == 'active'"/>
             <button string="Publish" type="object" name="publish_quote" invisible = "published == True"/>
             <button string="Close Order" type="object" name="close_quote" invisible = "status != 'active'"/>
@@ -25,6 +27,9 @@
                 <field name="name"/>
             </h1>
             </div>
+            <div class="alert alert-success" role="alert" invisible="is_sent == False">
+                Sales Order has been created Successfully at <field name="vendor" readonly="1"/> , Order ID: <field name="related_remote_so" readonly="1" />
+              </div>
             <group string="Request Information">
                 <group>
                 <field name="emdad_category"/>
@@ -209,7 +214,7 @@
                 </group>
                 <group invisible="proc_status == 'pending'">
                     <group string="Pricing">
-                        <field name="product_cost"/>
+                        <field name="product_cost" readonly="1"/>
                         <field name="discount"/>
                         <field name="tax_amount"/>
                     </group>
