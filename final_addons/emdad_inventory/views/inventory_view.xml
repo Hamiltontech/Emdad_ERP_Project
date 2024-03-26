@@ -62,6 +62,7 @@
                                     <field name="address"/>
                                     <field name="city"/>
                                     <field name="country"/>
+                                    <field name="full_address"/>
                                 </group>
                                 <group string="Management">
                                 <field name="warehouse_manager"/>

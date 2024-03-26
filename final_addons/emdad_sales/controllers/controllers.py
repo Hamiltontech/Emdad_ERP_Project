@@ -25,7 +25,7 @@ class Procurement(http.Controller):
             response=json.dumps(records, default=str)
         )
     
-    @http.route("/api/v1/sales/create", methods=["POST"], type="http", auth="none", csrf=False)
+    @http.route("/api/v1/sales/market/create/", methods=["POST"], type="http", auth="none", csrf=False)
     def create_sales(self, **post):
         
         payload = request.httprequest.data.decode()
@@ -85,5 +85,105 @@ class Procurement(http.Controller):
             headers=[("Cache-Control", "no-store"), ("Pragma", "no-cache"),("Access-Control-Allow-Origin","*"),("Access-Control-Allow-Headers","*")],
             response=json.dumps(data, default=str)
         )
+
+
+    @http.route("/api/v1/sales/direct/create/", methods=["POST"], type="http", auth="none", csrf=False)
+    def create_sales(self, **post):
+        
+        payload = request.httprequest.data.decode()
+
+        if not payload:
+            print("-----------")
+            return werkzeug.wrappers.Response(
+            status=400,
+            content_type="application/json; charset=utf-8",
+            headers=[("Cache-Control", "no-store"), ("Pragma", "no-cache"),("Access-Control-Allow-Origin","*"),("Access-Control-Allow-Headers","*")],
+            response=json.dumps("no data sent", default=str)
+            )
+        
+
+        data = json.loads(payload)[0]
+        print(444444444,data)
+
+        po_company_cr = data['po_company_cr'].get('cr_number')
+
+
+        if po_company_cr :
+            customer = request.env['emdad.contacts'].sudo().search_read([('cr_number','=',po_company_cr)],['id'])
+
+        if po_company_cr and customer:
+            sales_vals = {
+                "date":data["create_date"],
+                "effective_date":data["effective_date"],
+                "customer":customer[0]['id'],
+                "related_remote_po":data["id"]
+            }
+
+            sales_record = request.env["emdad.sales"].sudo().create(sales_vals)
+            
+            if not data['procurement_lines']:
+                
+                print("record did not created, products must be added to the RFQ")
+                return werkzeug.wrappers.Response(
+                    status=409,
+                    content_type="application/json; charset=utf-8",
+                    headers=[("Cache-Control", "no-store"), ("Pragma", "no-cache"),("Access-Control-Allow-Origin","*"),("Access-Control-Allow-Headers","*")],
+                    response=json.dumps("record did not created, products must be added to the PO", default=str)
+                )
+            
+            sales_lines = []
+            for line in data['procurement_lines']:
+                product_barcode = line['barcode']
+                product_local_id = request.env["product.management"].sudo().search([('barcode','=',product_barcode)])
+                if not product_local_id:
+                    #TODO delete the sales record 
+                    print("record did not created, product not found")
+                    return werkzeug.wrappers.Response(
+                        status=409,
+                        content_type="application/json; charset=utf-8",
+                        headers=[("Cache-Control", "no-store"), ("Pragma", "no-cache"),("Access-Control-Allow-Origin","*"),("Access-Control-Allow-Headers","*")],
+                        response=json.dumps("SO record did not created, product not found in vendor system", default=str)
+                    )
+                # metric_unit = product_local_id.selling_metric.
+                sales_lines_vals = {
+                    "related_sales":sales_record.id,
+                    "product_id":product_local_id.id,
+                    "related_remote_po_line":line['id'],
+                    "batch":line['batch'],
+                    "tax":line['taxes'],
+                    # "location":line['location'][1] if line['location'] else [],
+                    "qty":line['request_qty'],
+                    "description":line['description'],
+                    "metric_unit":product_local_id.selling_metric.id,
+                    "description":line['description'],
+                    "barcode":line['barcode'],
+                    "attach":line['attach'],
+                    "request_qty":line['request_qty'],
+                }
+
+                sales_lines_record = request.env["emdad.sales.line"].sudo().create(sales_lines_vals)
+                sales_lines.append(sales_lines_record.id)
+                print(sales_lines_record.id)
+
+            print(sales_lines)
+            sales_record.update({"order_lines":sales_lines})
+
+
+            
+            return werkzeug.wrappers.Response(
+                status=201,
+                content_type="application/json; charset=utf-8",
+                headers=[("Cache-Control", "no-store"), ("Pragma", "no-cache"),("Access-Control-Allow-Origin","*"),("Access-Control-Allow-Headers","*")],
+                response=json.dumps("Sales Order Successfully Created", default=str)
+            )
+        else:
+            return werkzeug.wrappers.Response(
+                status=409,
+                content_type="application/json; charset=utf-8",
+                headers=[("Cache-Control", "no-store"), ("Pragma", "no-cache"),("Access-Control-Allow-Origin","*"),("Access-Control-Allow-Headers","*")],
+                response=json.dumps("Your company is not exists in vendor contacts", default=str)
+            )
+
+
 
 
