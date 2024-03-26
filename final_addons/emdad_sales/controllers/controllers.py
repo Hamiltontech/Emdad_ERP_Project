@@ -106,12 +106,13 @@ class Procurement(http.Controller):
         print(444444444,data)
 
         po_company_cr = data['po_company_cr'].get('cr_number')
+        print(po_company_cr)
 
 
-        if po_company_cr:
+        if po_company_cr :
             customer = request.env['emdad.contacts'].sudo().search_read([('cr_number','=',po_company_cr)],['id'])
 
-        if customer:
+        if po_company_cr and customer:
             print(88888888,customer)
             sales_vals = {
                 "date":data["create_date"],
