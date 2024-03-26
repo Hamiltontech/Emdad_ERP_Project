@@ -106,14 +106,12 @@ class Procurement(http.Controller):
         print(444444444,data)
 
         po_company_cr = data['po_company_cr'].get('cr_number')
-        print(po_company_cr)
 
 
         if po_company_cr :
             customer = request.env['emdad.contacts'].sudo().search_read([('cr_number','=',po_company_cr)],['id'])
 
         if po_company_cr and customer:
-            print(88888888,customer)
             sales_vals = {
                 "date":data["create_date"],
                 "effective_date":data["effective_date"],
@@ -122,10 +120,19 @@ class Procurement(http.Controller):
             }
 
             sales_record = request.env["emdad.sales"].sudo().create(sales_vals)
-
+            
+            if not data['procurement_lines']:
+                
+                print("record did not created, products must be added to the RFQ")
+                return werkzeug.wrappers.Response(
+                    status=409,
+                    content_type="application/json; charset=utf-8",
+                    headers=[("Cache-Control", "no-store"), ("Pragma", "no-cache"),("Access-Control-Allow-Origin","*"),("Access-Control-Allow-Headers","*")],
+                    response=json.dumps("record did not created, products must be added to the PO", default=str)
+                )
+            
             sales_lines = []
             for line in data['procurement_lines']:
-                # print(888888888888888,line)
                 product_barcode = line['barcode']
                 product_local_id = request.env["product.management"].sudo().search([('barcode','=',product_barcode)])
                 if not product_local_id:
