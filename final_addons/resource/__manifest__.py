@@ -24,6 +24,8 @@ associated to every resource. It also manages the leaves of every resource.
         'views/resource_calendar_views.xml',
         'views/menuitems.xml',
     ],
+    'installable': True,
+    'auto_install': True,
     'demo': [
         'data/resource_demo.xml',
     ],

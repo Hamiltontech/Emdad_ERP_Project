@@ -16,10 +16,11 @@
         'reports/delivery_note.xml',
         'reports/delivery_note_action.xml'
     ],
+    'installable': True,
+    'auto_install': True,
     'demo': [
         ''
     ],
-    'auto_install': False,
     'application': False,
     'assets': {
         
